@@ -19,7 +19,10 @@ class IntegrationTest < Minitest::Test
         User.new(**attributes.dup.tap { |duped| duped.delete(:age) })
       end
 
-    users.map! { |user| user.as_json(includes: :title, attach: { age: ages }) }
+    users.map! do |user|
+      user.serialized(includes: :title, attach: { age: ages })
+    end
+
     assert_equal EXPECTED, users
   end
 end

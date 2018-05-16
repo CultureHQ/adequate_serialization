@@ -5,21 +5,19 @@ require 'test_helper'
 class AdequateSerializationTest < Minitest::Test
   def test_dump_on_hash
     value = { foo: 'baz' }
-    assert_equal value, AdequateSerialization.dump(value)
-  end
-
-  def test_dump_on_non_as_json_responsive
-    value = Object.new
-    def value.respond_to?(method)
-      method == :as_json ? false : super
-    end
 
     assert_equal value, AdequateSerialization.dump(value)
   end
 
-  def test_dump_on_as_json_responsive
+  def test_dump_on_non_serialized_responsive
     value = Object.new
-    def value.as_json
+
+    assert_equal value, AdequateSerialization.dump(value)
+  end
+
+  def test_dump_on_serialized_responsive
+    value = Object.new
+    def value.serialized
       'baz'
     end
 

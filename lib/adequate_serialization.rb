@@ -13,7 +13,7 @@ module AdequateSerialization
   class << self
     def dump(value)
       return value if value.is_a?(Hash)
-      value.respond_to?(:as_json) ? value.as_json : value
+      value.respond_to?(:serialized) ? value.serialized : value
     end
 
     def prepend(step)

@@ -5,10 +5,10 @@ class SerializableTest < Minitest::Test
     assert_kind_of UserSerializer, User.serializer
   end
 
-  def test_as_json
+  def test_serialized
     response =
       AdequateSerialization::Steps.stub(:apply, 'response') do
-        User.new.as_json
+        User.new.serialized
       end
 
     assert_equal 'response', response
