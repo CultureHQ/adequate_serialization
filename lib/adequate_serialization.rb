@@ -5,6 +5,10 @@ require 'adequate_serialization/serializer'
 require 'adequate_serialization/steps'
 require 'adequate_serialization/version'
 
+require 'adequate_serialization/steps/passthrough_step'
+require 'adequate_serialization/steps/rails_cache_step'
+require 'adequate_serialization/steps/serialize_step'
+
 module AdequateSerialization
   class << self
     def prepend(step)
