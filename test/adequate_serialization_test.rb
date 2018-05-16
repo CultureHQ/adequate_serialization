@@ -10,6 +10,10 @@ class AdequateSerializationTest < Minitest::Test
 
   def test_dump_on_non_as_json_responsive
     value = Object.new
+    def value.respond_to?(method)
+      method == :as_json ? false : super
+    end
+
     assert_equal value, AdequateSerialization.dump(value)
   end
 
