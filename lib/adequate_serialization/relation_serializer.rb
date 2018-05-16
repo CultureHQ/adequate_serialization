@@ -21,7 +21,7 @@ module AdequateSerialization
     def as_json(*options)
       return [] if empty?
 
-      opts = ::BaseSerializer::Opts.from(*options, multi_caching: true)
+      opts = Serializer::Options.from(*options, multi_caching: true)
       cache_keys = map { |record| opts.cache_key_for(record) }
 
       results_for(cache_keys, opts)

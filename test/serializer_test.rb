@@ -75,14 +75,14 @@ class SerializerTest < Minitest::Test
       opt_bar: 'opt_bar'
     )
 
-    opts = AdequateSerialization::Opts.from(includes: %i[opt_foo opt_bar])
+    opts = AdequateSerialization::Options.from(includes: %i[opt_foo opt_bar])
     actual = FooSerializer.new.serialize(Foo.new(foo: true), opts)
 
     assert_equal expected, actual
   end
 
   def test_serialize_all
-    opts = AdequateSerialization::Opts.from(includes: %i[all])
+    opts = AdequateSerialization::Options.from(includes: %i[all])
     actual = FooSerializer.new.serialize(Foo.new(foo: true, bar: false), opts)
 
     assert_equal 'all', actual[:all]

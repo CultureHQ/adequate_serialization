@@ -1,6 +1,6 @@
 module AdequateSerialization
-  module Opts
-    class SerializationOpts
+  module Options
+    class Opts
       attr_reader :includes, :attachments, :options
 
       def initialize(includes: [], attach: {}, multi_caching: nil, **options)
@@ -14,8 +14,8 @@ module AdequateSerialization
         @multi_caching
       end
 
-      def cache_key_for(record)
-        includes.empty? ? record : [record, *includes]
+      def cache_key_for(object)
+        includes.empty? ? object : [object, *includes]
       end
     end
 
@@ -26,7 +26,7 @@ module AdequateSerialization
     end
 
     def self.from(*opts)
-      SerializationOpts.new(**(opts[0] || {}))
+      Opts.new(**(opts[0] || {}))
     end
 
     def self.null

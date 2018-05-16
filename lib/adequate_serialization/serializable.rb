@@ -13,7 +13,7 @@ module AdequateSerialization
     end
 
     def as_json(*opts)
-      opts = Serializer::Opts.from(*opts)
+      opts = Options.from(*opts)
 
       serialized_for(opts).tap do |serialized|
         opts.attachments.each do |name, attachment|
