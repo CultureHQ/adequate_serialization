@@ -1,7 +1,6 @@
 require 'adequate_serialization/attribute'
 require 'adequate_serialization/decorator'
 require 'adequate_serialization/options'
-require 'adequate_serialization/relation_serializer'
 require 'adequate_serialization/serializable'
 require 'adequate_serialization/serializer'
 require 'adequate_serialization/steps'
@@ -10,7 +9,9 @@ require 'adequate_serialization/version'
 require 'adequate_serialization/steps/passthrough_step'
 require 'adequate_serialization/steps/serialize_step'
 
+require 'adequate_serialization/rails/cache_key'
 require 'adequate_serialization/rails/cache_step'
+require 'adequate_serialization/rails/relation_serializer'
 
 module AdequateSerialization
   class << self
