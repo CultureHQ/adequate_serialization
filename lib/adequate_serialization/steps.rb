@@ -25,4 +25,14 @@ module AdequateSerialization
       end
     end
   end
+
+  class << self
+    def prepend(step)
+      @steps ||= step.new(steps)
+    end
+
+    def steps
+      @steps ||= Steps::SerializeStep.new
+    end
+  end
 end

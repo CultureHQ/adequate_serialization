@@ -3,6 +3,7 @@
 require 'test_helper'
 
 class CacheKeyTest < Minitest::Test
+  AdequateSerialization.hook_into_rails!
   include AdequateSerialization::Rails
 
   def test_a_non_record_non_cachable_object

@@ -9,23 +9,20 @@ require 'adequate_serialization/version'
 require 'adequate_serialization/steps/passthrough_step'
 require 'adequate_serialization/steps/serialize_step'
 
-require 'adequate_serialization/rails/cache_key'
-require 'adequate_serialization/rails/cache_step'
-require 'adequate_serialization/rails/relation_serializer'
-
 module AdequateSerialization
   class << self
-    def dump(value)
-      return value if value.is_a?(Hash)
-      value.respond_to?(:serialized) ? value.serialized : value
+    def dump(object)
+      return object if object.is_a?(Hash)
+      object.respond_to?(:serialized) ? object.serialized : object
     end
 
-    def prepend(step)
-      @steps ||= step.new(steps)
-    end
-
-    def steps
-      @steps ||= Steps::SerializeStep.new
+    def hook_into_rails!
+      @hooked_into_rails ||=
+        begin
+          require 'adequate_serialization/rails/hook'
+          Rails.hook_in!
+          true
+        end
     end
   end
 end
