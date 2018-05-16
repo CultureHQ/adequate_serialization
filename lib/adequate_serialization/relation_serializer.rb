@@ -1,53 +1,33 @@
 # frozen_string_literal: true
 
 module AdequateSerialization
-  class RelationSerializer < SimpleDelegator
-    class NullDecorator
-      def decorate(result)
-        result
-      end
+  class RelationSerializer
+    attr_reader :relation
+
+    def initialize(relation)
+      @relation = relation
     end
 
-    class AttachmentDecorator < TinyStruct.new(:attachments)
-      def decorate(result)
-        attachments.each do |name, attachment|
-          result[name] = attachment[result[:id]]
-        end
+    def serialized(*opts)
+      return [] if relation.empty?
 
-        result
-      end
-    end
+      options = Options.from(*opts, multi_caching: true)
+      cache_keys = relation.map { |record| options.cache_key_for(record) }
 
-    def as_json(*options)
-      return [] if empty?
-
-      opts = Serializer::Options.from(*options, multi_caching: true)
-      cache_keys = map { |record| opts.cache_key_for(record) }
-
-      results_for(cache_keys, opts)
+      results_for(cache_keys, options)
     end
 
     private
 
-    def fetch_multi_for(cache_keys, opts)
+    def fetch_multi_for(cache_keys, options)
       Rails.cache.fetch_multi(*cache_keys) do |(record, *)|
-        record.class.serializer.serialize(record, opts)
+        record.class.serializer.serialize(record, options)
       end
     end
 
-    def decorator_for(opts)
-      attachments = opts.attachments
-
-      if attachments.empty?
-        NullDecorator.new
-      else
-        AttachmentDecorator.new(attachments)
-      end
-    end
-
-    def results_for(cache_keys, opts)
-      decorator = decorator_for(opts)
-      results = fetch_multi_for(cache_keys, opts)
+    def results_for(cache_keys, options)
+      decorator = Decorator.from(opts.attachments)
+      results = fetch_multi_for(cache_keys, options)
 
       cache_keys.map do |cache_key|
         decorator.decorate(results[cache_key])

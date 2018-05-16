@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 module AdequateSerialization
-  module Steps
-    class RailsCacheStep < PassthroughStep
+  module Rails
+    class CacheStep < Steps::PassthroughStep
       def apply(response)
         if response.opts.options[:multi_caching] || !cacheable?(response)
           return apply_next(response)
         end
 
-        Rails.cache.fetch(cache_key_for(response)) do
+        ::Rails.cache.fetch(cache_key_for(response)) do
           apply_next(response)
         end
       end
