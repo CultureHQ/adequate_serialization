@@ -4,7 +4,7 @@ module AdequateSerialization
   module Steps
     class LastStep
       def apply(response)
-        response.current
+        response.object
       end
     end
 

@@ -12,16 +12,15 @@ module AdequateSerialization
     end
 
     class Response
-      attr_reader :object, :opts, :current
+      attr_reader :object, :opts
 
-      def initialize(object, opts = {}, current = nil)
+      def initialize(object, opts = {})
         @object = object
         @opts = opts
-        @current = current
       end
 
-      def mutate(current)
-        self.class.new(object, opts, current)
+      def mutate(new_object)
+        self.class.new(new_object, opts)
       end
     end
   end

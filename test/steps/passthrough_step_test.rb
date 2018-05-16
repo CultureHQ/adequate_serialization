@@ -5,17 +5,17 @@ class PassthroughStepTest < Minitest::Test
 
   def test_last_step
     current = Object.new
-    response = Response.new(Object.new, {}, current)
+    response = Response.new(current, {})
 
     assert_equal current, LastStep.new.apply(response)
   end
 
   def test_passthrough_step
-    response = Response.new(Object.new, {}, 'foo')
+    response = Response.new('foo', {})
     next_step = Object.new
 
     def next_step.apply(response)
-      response.current * 2
+      response.object * 2
     end
 
     assert_equal 'foofoo', PassthroughStep.new(next_step).apply(response)

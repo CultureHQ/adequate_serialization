@@ -79,6 +79,10 @@ class User
   def cache_key
     "user/#{id}"
   end
+
+  def ==(other)
+    other.is_a?(User) && id == other.id
+  end
 end
 
 class UserSerializer < AdequateSerialization::Serializer

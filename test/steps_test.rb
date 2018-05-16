@@ -21,12 +21,13 @@ class StepsTest < Minitest::Test
   end
 
   def test_response_mutate
-    response = AdequateSerialization::Steps::Response.new(Object.new, nil)
-    mutated = response.mutate('foo')
+    object = Object.new
+    response = AdequateSerialization::Steps::Response.new(object, nil)
 
-    assert_nil response.current
+    mutated = response.mutate('foo')
+    assert_equal object, response.object
 
     assert_kind_of AdequateSerialization::Steps::Response, mutated
-    assert_equal 'foo', mutated.current
+    assert_equal 'foo', mutated.object
   end
 end
