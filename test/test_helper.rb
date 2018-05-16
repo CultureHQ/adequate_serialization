@@ -12,6 +12,10 @@ ActiveRecord::Base.establish_connection(
   database: ':memory:'
 )
 
+# This because AR::Migration outputs to standard out and there's no way to shut
+# it off short of redefining $stdout. Lame. I just want green dots.
+ActiveRecord::Migration.prepend(Module.new { def say(*); end })
+
 Rails.cache = ActiveSupport::Cache::MemoryStore.new
 
 ActiveRecord::Schema.define do
