@@ -4,7 +4,7 @@ module AdequateSerialization
   module Steps
     class RailsCacheStep < PassthroughStep
       def apply(response)
-        if response.opts.multi_caching? || !cacheable?(response)
+        if response.opts.options[:multi_caching] || !cacheable?(response)
           return apply_next(response)
         end
 

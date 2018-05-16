@@ -3,7 +3,7 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'adequate_serialization'
 
-require 'active_record'
+require 'rails/all'
 require 'sqlite3'
 require 'minitest/autorun'
 
@@ -11,6 +11,8 @@ ActiveRecord::Base.establish_connection(
   adapter: 'sqlite3',
   database: ':memory:'
 )
+
+Rails.cache = ActiveSupport::Cache::MemoryStore.new
 
 ActiveRecord::Schema.define do
   create_table :posts, force: true do |t|
@@ -71,6 +73,10 @@ class User
     @id = id
     @name = name
     @title = title
+  end
+
+  def cache_key
+    "user/#{id}"
   end
 end
 
