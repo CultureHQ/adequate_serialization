@@ -40,7 +40,7 @@ module AdequateSerialization
       def cacheable_response_for(opts, decorator, cache_keys)
         results =
           ::Rails.cache.fetch_multi(*cache_keys) do |(record, *)|
-            record.serialized(opts)
+            serialize(record, opts)
           end
 
         cache_keys.map do |cache_key|
@@ -50,8 +50,12 @@ module AdequateSerialization
 
       def uncacheable_response_for(opts, decorator)
         relation.map do |record|
-          decorator.decorate(record.serialized(opts))
+          decorator.decorate(serialize(record, opts))
         end
+      end
+
+      def serialize(record, opts)
+        record.class.serializer.serialize(record, opts)
       end
     end
   end

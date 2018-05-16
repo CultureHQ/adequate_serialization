@@ -42,7 +42,7 @@ class Comment < ApplicationRecord
 end
 
 class PostSerializer < AdequateSerialization::Serializer
-  attribute :id, :title, :created_at, :updated_at
+  attribute :id, :title, :created_at
   attribute :comments, optional: true
 end
 
