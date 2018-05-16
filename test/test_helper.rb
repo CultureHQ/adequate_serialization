@@ -6,9 +6,14 @@ require 'adequate_serialization'
 require 'minitest/autorun'
 
 class User
+  ID = 1
   NAME = 'Kevin'
 
   include AdequateSerialization::Serializable
+
+  def id
+    ID
+  end
 
   def name
     NAME
@@ -16,5 +21,5 @@ class User
 end
 
 class UserSerializer < AdequateSerialization::Serializer
-  attribute :name
+  attribute :id, :name
 end
