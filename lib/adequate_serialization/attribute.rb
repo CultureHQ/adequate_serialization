@@ -10,7 +10,7 @@ module AdequateSerialization
       end
 
       def serialize_to(response, model, _includes)
-        response[name] = Attribute.dump(model.public_send(name))
+        response[name] = AdequateSerialization.dump(model.public_send(name))
       end
     end
 
@@ -23,7 +23,7 @@ module AdequateSerialization
       end
 
       def serialize_to(response, model, _includes)
-        response[name] = Attribute.dump(block.call(model))
+        response[name] = AdequateSerialization.dump(block.call(model))
       end
     end
 
@@ -102,22 +102,15 @@ module AdequateSerialization
       end
     end
 
-    class << self
-      def dump(value)
-        return value if value.is_a?(Hash)
-        value.respond_to?(:as_json) ? value.as_json : value
-      end
+    def self.from(name, options = {}, &block)
+      attribute =
+        if block
+          Synthesized.new(name, &block)
+        else
+          Simple.new(name)
+        end
 
-      def from(name, options = {}, &block)
-        attribute =
-          if block
-            Synthesized.new(name, &block)
-          else
-            Simple.new(name)
-          end
-
-        Config.new(attribute, options).to_attribute
-      end
+      Config.new(attribute, options).to_attribute
     end
   end
 end

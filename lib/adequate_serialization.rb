@@ -11,6 +11,11 @@ require 'adequate_serialization/steps/serialize_step'
 
 module AdequateSerialization
   class << self
+    def dump(value)
+      return value if value.is_a?(Hash)
+      value.respond_to?(:as_json) ? value.as_json : value
+    end
+
     def prepend(step)
       @steps ||= step.new(steps)
     end

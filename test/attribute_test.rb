@@ -83,25 +83,6 @@ class AttributeTest < Minitest::Test
     refute serialized.key?(:foo)
   end
 
-  def test_dump_on_hash
-    value = { foo: 'baz' }
-    assert_equal value, AdequateSerialization::Attribute.dump(value)
-  end
-
-  def test_dump_on_non_as_json_responsive
-    value = Object.new
-    assert_equal value, AdequateSerialization::Attribute.dump(value)
-  end
-
-  def test_dump_on_as_json_responsive
-    value = Object.new
-    def value.as_json
-      'baz'
-    end
-
-    assert_equal 'baz', AdequateSerialization::Attribute.dump(value)
-  end
-
   def test_from_simple
     attribute = AdequateSerialization::Attribute.from(:foo, {})
 
