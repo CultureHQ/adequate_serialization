@@ -17,33 +17,6 @@ class OptionsTest < Minitest::Test
     assert_equal 'bar', opts.options[:foo]
   end
 
-  def test_multi_caching?
-    opts = opts_for(multi_caching: true)
-
-    assert opts.multi_caching?
-  end
-
-  def test_cache_key_for_no_includes
-    opts = opts_for
-    object = Object.new
-
-    assert_equal object, opts.cache_key_for(object)
-  end
-
-  def test_cache_key_with_one_include
-    opts = opts_for(includes: :foo)
-    object = Object.new
-
-    assert_equal [object, :foo], opts.cache_key_for(object)
-  end
-
-  def test_cache_key_with_multiple_includes
-    opts = opts_for(includes: %i[foo bar])
-    object = Object.new
-
-    assert_equal [object, :foo, :bar], opts.cache_key_for(object)
-  end
-
   def test_from_nothing_passed
     assert_kind_of Opts, AdequateSerialization::Options.from
   end
@@ -58,7 +31,7 @@ class OptionsTest < Minitest::Test
   def test_null
     opts = AdequateSerialization::Options.null
 
-    assert_kind_of NullOpts, opts
+    assert_kind_of Opts, opts
     assert_empty opts.includes
   end
 
