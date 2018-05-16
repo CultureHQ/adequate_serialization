@@ -13,7 +13,7 @@ module AdequateSerialization
     end
 
     def self.from(*opts)
-      Opts.new(**(opts[0] || {}))
+      Opts.new(opts[0] || {})
     end
 
     def self.null

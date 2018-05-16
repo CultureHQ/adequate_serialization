@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'adequate_serialization/attribute'
 require 'adequate_serialization/decorator'
 require 'adequate_serialization/options'
@@ -17,7 +19,7 @@ module AdequateSerialization
     end
 
     def hook_into_rails!
-      @hooked_into_rails ||=
+      @hook_into_rails ||=
         begin
           require 'adequate_serialization/rails/hook'
           Rails.hook_in!

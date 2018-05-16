@@ -28,7 +28,7 @@ module AdequateSerialization
 
   class << self
     def prepend(step)
-      @steps ||= step.new(steps)
+      @steps = step.new(steps)
     end
 
     def steps

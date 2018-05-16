@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'adequate_serialization'
 
 require 'rails/all'
@@ -52,10 +52,7 @@ class CommentSerializer < AdequateSerialization::Serializer
 end
 
 Post.create!(title: 'Adequate Serialization') do |post|
-  post.comments.build([
-    { body: 'Great post!' },
-    { body: 'This is great!' }
-  ])
+  post.comments.build([{ body: 'Great post!' }, { body: 'This is great!' }])
 end
 
 Post.create!(title: 'Other Serialization Techniques')

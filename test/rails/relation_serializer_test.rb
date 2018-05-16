@@ -30,21 +30,12 @@ class RelationSerializerTest < Minitest::Test
 
   def test_attaches_objects
     relation = Post.all
-    attachments =
-      relation.each_with_object({}) do |record, attached|
-        attached[record.id] = record.title * 2
-      end
-
-    options = { attach: { doubled_title: attachments } }
-    serialized = RelationSerializer.new(relation).serialized(options)
+    serialized =
+      RelationSerializer.new(relation).serialized(attach_options_for(relation))
 
     assert_equal relation.size, serialized.size
     assert_equal relation.size, entries
-
-    relation.each_with_index do |record, index|
-      refute Rails.cache.fetch(record).key?(:doubled_title)
-      assert_equal record.title * 2, serialized[index][:doubled_title]
-    end
+    assert_correct_attachment_behavior relation, serialized
   end
 
   private
@@ -52,5 +43,21 @@ class RelationSerializerTest < Minitest::Test
   # Why is there no quick way to determine how many entries are in the cache?
   def entries
     Rails.cache.instance_variable_get(:@data).size
+  end
+
+  def attach_options_for(relation)
+    attachments =
+      relation.each_with_object({}) do |record, attached|
+        attached[record.id] = record.id * 2
+      end
+
+    { attach: { double_id: attachments } }
+  end
+
+  def assert_correct_attachment_behavior(relation, serialized)
+    relation.each_with_index do |record, index|
+      refute Rails.cache.fetch(record).key?(:double_id)
+      assert_equal record.id * 2, serialized[index][:double_id]
+    end
   end
 end

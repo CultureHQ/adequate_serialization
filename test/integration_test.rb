@@ -16,7 +16,7 @@ class IntegrationTest < Minitest::Test
     users =
       EXPECTED.map do |attributes|
         ages[attributes[:id]] = attributes[:age]
-        User.new(**attributes.dup.tap { |duped| duped.delete(:age) })
+        User.new(attributes.dup.tap { |duped| duped.delete(:age) })
       end
 
     users.map! do |user|

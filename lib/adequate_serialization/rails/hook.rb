@@ -22,6 +22,7 @@ module AdequateSerialization
     def self.hook_in!
       ActiveRecord::Base.include(RecordHook)
       ActiveRecord::Relation.include(RelationHook)
+      AdequateSerialization.prepend(CacheStep)
     end
   end
 end

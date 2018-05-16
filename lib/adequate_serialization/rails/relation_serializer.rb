@@ -31,7 +31,7 @@ module AdequateSerialization
       end
 
       def cache_keys_for(opts)
-        relation.map do |record, cache_keys|
+        relation.map do |record|
           return nil unless CacheKey.cacheable?(record)
           CacheKey.for(record, opts.includes)
         end
