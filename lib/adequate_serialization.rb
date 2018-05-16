@@ -1,1 +1,5 @@
+require 'adequate_serialization/attribute'
+require 'adequate_serialization/opts'
+require 'adequate_serialization/serializable'
+require 'adequate_serialization/serializer'
 require 'adequate_serialization/version'

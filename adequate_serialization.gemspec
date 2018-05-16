@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Kevin Deisz']
   spec.email         = ['kevin.deisz@gmail.com']
 
-  spec.summary       = 'Serializes ActiveRecord records adequately'
+  spec.summary       = 'Serializes objects adequately'
   spec.homepage      = 'https://github.com/kddeisz/adequate_serialization'
   spec.license       = 'MIT'
 

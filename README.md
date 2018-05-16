@@ -1,6 +1,6 @@
 # AdequateSerialization
 
-Serializes ActiveRecord records adequately.
+Serializes objects adequately.
 
 ## Installation
 
