@@ -3,21 +3,9 @@
 class SerializeStepTest < Minitest::Test
   include AdequateSerialization::Steps
 
-  class Foo
-    include AdequateSerialization::Serializable
-
-    def foo
-      'foo'
-    end
-  end
-
-  class FooSerializer < AdequateSerialization::Serializer
-    attribute :foo
-  end
-
   def test_serialize_step
-    response = Response.new(Foo.new, AdequateSerialization::Options.null)
+    response = Response.new(User.new, AdequateSerialization::Options.null)
 
-    assert_equal 'foo', SerializeStep.new.apply(response)[:foo]
+    assert_equal User::NAME, SerializeStep.new.apply(response)[:name]
   end
 end
