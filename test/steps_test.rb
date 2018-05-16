@@ -2,17 +2,20 @@
 
 class StepsTest < Minitest::Test
   def test_apply
-    expected = { id: User::ID, name: User::NAME }
-    actual = AdequateSerialization::Steps.apply(User.new)
+    user = User.new
+
+    expected = { id: user.id, name: user.name }
+    actual = AdequateSerialization::Steps.apply(user)
 
     assert_equal expected, actual
   end
 
   def test_apply_with_attachments
-    expected = { id: User::ID, name: User::NAME, age: 27 }
+    user = User.new
+    expected = { id: user.id, name: user.name, age: 27 }
 
     ages = { 1 => 27 }
-    actual = AdequateSerialization::Steps.apply(User.new, attach: { age: ages })
+    actual = AdequateSerialization::Steps.apply(user, attach: { age: ages })
 
     assert_equal expected, actual
   end

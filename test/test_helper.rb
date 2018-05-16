@@ -6,20 +6,18 @@ require 'adequate_serialization'
 require 'minitest/autorun'
 
 class User
-  ID = 1
-  NAME = 'Kevin'
-
   include AdequateSerialization::Serializable
 
-  def id
-    ID
-  end
+  attr_reader :id, :name, :title
 
-  def name
-    NAME
+  def initialize(id: 1, name: 'Clark Kent', title: 'Superman')
+    @id = id
+    @name = name
+    @title = title
   end
 end
 
 class UserSerializer < AdequateSerialization::Serializer
   attribute :id, :name
+  attribute :title, optional: true
 end
