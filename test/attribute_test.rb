@@ -119,5 +119,6 @@ class AttributeTest < Minitest::Test
 
     assert_kind_of Synthesized, attribute
     assert_equal :foo, attribute.name
+    assert_equal 'bazbaz', attribute.serialize_to({}, Model.new, [])
   end
 end
