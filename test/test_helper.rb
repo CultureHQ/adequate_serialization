@@ -1,11 +1,16 @@
 # frozen_string_literal: true
 
+require 'simplecov'
+SimpleCov.start
+
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'adequate_serialization'
 
 require 'rails/all'
 require 'sqlite3'
 require 'minitest/autorun'
+
+AdequateSerialization.hook_into_rails!
 
 ActiveRecord::Base.establish_connection(
   adapter: 'sqlite3',

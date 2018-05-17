@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class RelationSerializerTest < Minitest::Test
-  AdequateSerialization.hook_into_rails!
   include AdequateSerialization::Rails
 
   def setup
