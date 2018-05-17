@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class StepsTest < Minitest::Test
+  def setup
+    Rails.cache.clear
+  end
+
   def test_apply
     user = User.new
 

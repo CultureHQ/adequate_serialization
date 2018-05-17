@@ -3,7 +3,6 @@
 require 'test_helper'
 
 class CacheStepTest < Minitest::Test
-  AdequateSerialization.hook_into_rails!
   include AdequateSerialization::Rails
 
   def setup

@@ -10,6 +10,8 @@ require 'rails/all'
 require 'sqlite3'
 require 'minitest/autorun'
 
+AdequateSerialization.hook_into_rails!
+
 ActiveRecord::Base.establish_connection(
   adapter: 'sqlite3',
   database: ':memory:'
