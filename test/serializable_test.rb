@@ -8,7 +8,7 @@ class SerializableTest < Minitest::Test
   def test_serialized
     response =
       AdequateSerialization::Steps.stub(:apply, 'response') do
-        User.new.serialized
+        User.new.as_json
       end
 
     assert_equal 'response', response

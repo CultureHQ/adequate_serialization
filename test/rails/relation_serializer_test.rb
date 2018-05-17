@@ -11,7 +11,7 @@ class RelationSerializerTest < Minitest::Test
   def test_cacheable
     relation = Post.all
 
-    serialized = RelationSerializer.new(relation).serialized
+    serialized = RelationSerializer.new(relation).as_json
     assert_equal relation.size, serialized.size
     assert_equal relation.size, entries
 
@@ -23,7 +23,7 @@ class RelationSerializerTest < Minitest::Test
   def test_non_cacheable
     relation = Post.select(:id, :title, :created_at)
 
-    serialized = RelationSerializer.new(relation).serialized
+    serialized = RelationSerializer.new(relation).as_json
     assert_equal relation.size, serialized.size
     assert entries.zero?
   end
@@ -31,7 +31,7 @@ class RelationSerializerTest < Minitest::Test
   def test_attaches_objects
     relation = Post.all
     serialized =
-      RelationSerializer.new(relation).serialized(attach_options_for(relation))
+      RelationSerializer.new(relation).as_json(attach_options_for(relation))
 
     assert_equal relation.size, serialized.size
     assert_equal relation.size, entries

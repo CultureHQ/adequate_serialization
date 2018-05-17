@@ -9,15 +9,18 @@ class AdequateSerializationTest < Minitest::Test
     assert_equal value, AdequateSerialization.dump(value)
   end
 
-  def test_dump_on_non_serialized_responsive
+  def test_dump_on_non_as_json_responsive
     value = Object.new
+    def value.respond_to?(method)
+      method == :as_json ? false : super
+    end
 
     assert_equal value, AdequateSerialization.dump(value)
   end
 
-  def test_dump_on_serialized_responsive
+  def test_dump_on_as_json_responsive
     value = Object.new
-    def value.serialized
+    def value.as_json
       'baz'
     end
 

@@ -12,7 +12,7 @@ module AdequateSerialization
       end
     end
 
-    def serialized(*opts)
+    def as_json(*opts)
       Steps.apply(self, *opts)
     end
   end

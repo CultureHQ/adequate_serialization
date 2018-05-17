@@ -14,8 +14,13 @@ require 'adequate_serialization/steps/serialize_step'
 module AdequateSerialization
   class << self
     def dump(object)
-      return object if object.is_a?(Hash)
-      object.respond_to?(:serialized) ? object.serialized : object
+      if object.is_a?(Hash)
+        object
+      elsif object.respond_to?(:as_json)
+        object.as_json
+      else
+        object
+      end
     end
 
     def hook_into_rails!
@@ -23,7 +28,6 @@ module AdequateSerialization
         begin
           require 'adequate_serialization/rails/hook'
           Rails.hook_in!
-          true
         end
     end
   end

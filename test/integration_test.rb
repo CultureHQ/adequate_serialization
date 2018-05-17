@@ -20,7 +20,7 @@ class IntegrationTest < Minitest::Test
       end
 
     users.map! do |user|
-      user.serialized(includes: :title, attach: { age: ages })
+      user.as_json(includes: :title, attach: { age: ages })
     end
 
     assert_equal EXPECTED, users

@@ -1,6 +1,6 @@
 # AdequateSerialization
 
-Serializes objects adequately. `AdequateSerialization` allows you to define serializers that will convert your objects into simple hashes that are suitable for variable purposes such as caching or using in an HTTP response.
+Serializes objects adequately. `AdequateSerialization` allows you to define serializers that will convert your objects into simple hashes that are suitable for variable purposes such as caching or using in an HTTP response. It stems from the simple idea of giving slightly more control over the `as_json` method that gets called when objects are serialized using Rails' default controller serialization.
 
 ## Installation
 
@@ -20,7 +20,7 @@ Or install it yourself as:
 
 ## Usage
 
-First, include `AdequateSerialization::Serializable` in any object that you want to be able to serialize. Then, define a serializer matching the name of that object, postfixed with `"Serializer"`. Use the `AdequateSerialization` DSL to define the attributes that are available to the serializer. You can then call `serialized` on any instance of that object to get the resultant hash. Below is an example:
+First, include `AdequateSerialization::Serializable` in any object that you want to be able to serialize. Then, define a serializer matching the name of that object, postfixed with `"Serializer"`. Use the `AdequateSerialization` DSL to define the attributes that are available to the serializer. You can then call `as_json` on any instance of that object to get the resultant hash. Below is an example:
 
 ```ruby
 class User
@@ -35,7 +35,7 @@ class UserSerializer < AdequateSerialization::Serializer
   attribute :id, :name, :title
 end
 
-User.new(id: 1, name: 'Clark Kent', title: 'Superman').serialized
+User.new(id: 1, name: 'Clark Kent', title: 'Superman').as_json
 # => {:id=>1, :name=>"Clark Kent", :title=>"Superman"}
 ```
 
@@ -63,11 +63,11 @@ class UserSerializer < AdequateSerialization::Serializer
 end
 
 user = User.new(...)
-user.serialized
+user.as_json
 # => {:id=>1, :name=>"Clark Kent"}
 
 user.update(manager: true)
-user.serialized
+user.as_json
 # => {:id=>1, :name=>"Clark Kent", :title=>"Superman"}
 ```
 
@@ -77,7 +77,7 @@ This is the same as the `:if` option, but will result in the opposite behavior (
 
 #### :optional
 
-There are times when you want to include an attribute that you normally wouldn't. For example, if you have both `Post` and `Comment` objects, normally you wouldn't include the `post` attribute on the child `comment` objects. However, if you're serializing just the comment, it might be useful to have the `post` attached. In this case, you could mark the attribute as `optional` and it would only be included if it was listed in the `:includes` option passed to the `serialized` method, as in:
+There are times when you want to include an attribute that you normally wouldn't. For example, if you have both `Post` and `Comment` objects, normally you wouldn't include the `post` attribute on the child `comment` objects. However, if you're serializing just the comment, it might be useful to have the `post` attached. In this case, you could mark the attribute as `optional` and it would only be included if it was listed in the `:includes` option passed to the `as_json` method, as in:
 
 ```ruby
 class PostSerializer < AdequateSerialization::Serializer
@@ -91,11 +91,11 @@ class CommentSerializer < AdequateSerialization::Serializer
 end
 
 comment = Comment.new(...)
-comment.serialized
+comment.as_json
 # => {:id=>1, :body=>"This is a great gem!"}
 
-comment.serialized(includes: :post)
-# => {:id=>1, :body=>"This is a great gem!",:post=>{:id=>1, :title=>"Introducing Adequate Serializer", :body=>"This is adequate serializer."}}
+comment.as_json(includes: :post)
+# => {:id=>1, :body=>"This is a great gem!", :post=>{:id=>1, :title=>"Introducing Adequate Serializer", :body=>"This is adequate serializer."}}
 ```
 
 The `includes` key can take either a single name or an array of names.
@@ -111,11 +111,11 @@ upvotes =
   end
 # => {1=>true}
 
-Post.all.map(&:serialized)
+Post.all.map(&:as_json)
 # => [{:id=>1}, {:id=>2}]
 
-posts = Post.all.map { |post| post.serialized(attach: { upvoted: upvotes }) }
-# => [{:id=>1,:upvoted=>true}, {:id=>2,:upvoted=>false}]
+posts = Post.all.map { |post| post.as_json(attach: { upvoted: upvotes }) }
+# => [{:id=>1, :upvoted=>true}, {:id=>2, :upvoted=>false}]
 ```
 
 This relies on the objects to which you are attaching having an `id` attribute and the attachable hash being an index of `id` pointing to the attribute value.
@@ -125,10 +125,36 @@ This relies on the objects to which you are attaching having an `id` attribute a
 To get `AdequateSerializer` working with Rails, you can call `AdequateSerializion.hook_into_rails!` in an initializer. This will do three things:
 
 1. Introduce caching behavior so that when serializing objects they will by default be stored in the Rails cache.
-1. Include `AdequateSerializer::Serializable` in `ActiveRecord::Base` so that all of your models will be serializable, as well as aliasing `serialized` to `as_json` so that it hooks into Rails' expected serialization methods.
+1. Include `AdequateSerializer::Serializable` in `ActiveRecord::Base` so that all of your models will be serializable.
 2. Overwrite `ActiveRecord::Relation`'s `as_json` method to use the `AdequateSerializer::Rails::RelationSerializer` object, which by default will use the `Rails.cache.fetch_multi` method in order to more efficiently serialize all of the records in the relation.
 
 You can still use plain objects to be serialized, and if you want to take advantage of the caching behavior, you can define a `cache_key` method on the objects that you're serializing. This will cause `AdequateSerialization` to start putting them into the Rails cache.
+
+The result is that you can now this in your controllers:
+
+```ruby
+class UsersController
+  def show
+    user = User.find(params[:id])
+
+    render json: { user: user }
+  end
+end
+```
+
+and the response will be the serialized user. You can pass additional options that will get forwarded on to the serializer as well, as in:
+
+```ruby
+class UsersController
+  def show
+    user = User.find(params[:id])
+
+    render json: { user: user }, includes: :title
+  end
+end
+```
+
+and the result will now contain the `title` attribute (provided it was configured as an optional attribute). All options that previously were passed in to the `as_json` method get forwarded appropriately.
 
 ### Advanced
 

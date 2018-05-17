@@ -9,7 +9,7 @@ module AdequateSerialization
         @relation = relation
       end
 
-      def serialized(*options)
+      def as_json(*options)
         return [] if relation.empty?
 
         opts = Options.from(*options, multi_caching: true)
