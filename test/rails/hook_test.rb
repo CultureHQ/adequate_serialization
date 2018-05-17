@@ -18,6 +18,6 @@ class HookTest < Minitest::Test
     serialized = relation.as_json(includes: :comments)
 
     assert_equal relation.size, serialized.size
-    assert serialized.all? { |post| post.key?(:comments) }
+    assert(serialized.all? { |post| post.key?(:comments) })
   end
 end
