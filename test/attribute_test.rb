@@ -23,7 +23,7 @@ class AttributeTest < Minitest::Test
     attribute = Simple.new(:foo)
     serialized = {}
 
-    attribute.serialize_to(serialized, Model.new, [])
+    attribute.serialize_to(nil, serialized, Model.new, [])
     assert_equal 'baz', serialized[:foo]
   end
 
@@ -31,7 +31,7 @@ class AttributeTest < Minitest::Test
     attribute = Synthesized.new(:bar) { |model| model.foo * 2 }
     serialized = {}
 
-    attribute.serialize_to(serialized, Model.new, [])
+    attribute.serialize_to(nil, serialized, Model.new, [])
     assert_equal 'bazbaz', serialized[:bar]
   end
 
@@ -39,7 +39,7 @@ class AttributeTest < Minitest::Test
     attribute = IfCondition.new(Simple.new(:foo), :foo?)
     serialized = {}
 
-    attribute.serialize_to(serialized, Model.new(true), [])
+    attribute.serialize_to(nil, serialized, Model.new(true), [])
     assert_equal 'baz', serialized[:foo]
   end
 
@@ -47,7 +47,7 @@ class AttributeTest < Minitest::Test
     attribute = IfCondition.new(Simple.new(:foo), :foo?)
     serialized = {}
 
-    attribute.serialize_to(serialized, Model.new(false), [])
+    attribute.serialize_to(nil, serialized, Model.new(false), [])
     refute serialized.key?(:foo)
   end
 
@@ -55,7 +55,7 @@ class AttributeTest < Minitest::Test
     attribute = UnlessCondition.new(Simple.new(:foo), :foo?)
     serialized = {}
 
-    attribute.serialize_to(serialized, Model.new(true), [])
+    attribute.serialize_to(nil, serialized, Model.new(true), [])
     refute serialized.key?(:foo)
   end
 
@@ -63,7 +63,7 @@ class AttributeTest < Minitest::Test
     attribute = UnlessCondition.new(Simple.new(:foo), :foo?)
     serialized = {}
 
-    attribute.serialize_to(serialized, Model.new(false), [])
+    attribute.serialize_to(nil, serialized, Model.new(false), [])
     assert_equal 'baz', serialized[:foo]
   end
 
@@ -71,7 +71,7 @@ class AttributeTest < Minitest::Test
     attribute = Optional.new(Simple.new(:foo))
     serialized = {}
 
-    attribute.serialize_to(serialized, Model.new, %i[foo])
+    attribute.serialize_to(nil, serialized, Model.new, %i[foo])
     assert_equal 'baz', serialized[:foo]
   end
 
@@ -79,7 +79,7 @@ class AttributeTest < Minitest::Test
     attribute = Optional.new(Simple.new(:foo))
     serialized = {}
 
-    attribute.serialize_to(serialized, Model.new, [])
+    attribute.serialize_to(nil, serialized, Model.new, [])
     refute serialized.key?(:foo)
   end
 
@@ -119,6 +119,6 @@ class AttributeTest < Minitest::Test
 
     assert_kind_of Synthesized, attribute
     assert_equal :foo, attribute.name
-    assert_equal 'bazbaz', attribute.serialize_to({}, Model.new, [])
+    assert_equal 'bazbaz', attribute.serialize_to(nil, {}, Model.new, [])
   end
 end

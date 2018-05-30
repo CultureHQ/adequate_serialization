@@ -26,7 +26,7 @@ class SerializerTest < Minitest::Test
   class FooSerializer < AdequateSerialization::Serializer
     attribute :foo, :bar
     attribute :synth_foo do |foo|
-      foo.foo * 2
+      synth_foo_for(foo)
     end
 
     attribute :if_foo, :if_bar, if: :foo?
@@ -34,6 +34,12 @@ class SerializerTest < Minitest::Test
     attribute :opt_foo, :opt_bar, optional: true
 
     attribute :all, if: :foo?, unless: :bar?, optional: true
+
+    private
+
+    def synth_foo_for(foo)
+      foo.foo * 2
+    end
   end
 
   def test_attributes

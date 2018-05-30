@@ -24,7 +24,7 @@ module AdequateSerialization
 
     def serialize(model, opts = Options.null)
       self.class.attributes.each_with_object({}) do |attribute, response|
-        attribute.serialize_to(response, model, opts.includes)
+        attribute.serialize_to(self, response, model, opts.includes)
       end
     end
   end

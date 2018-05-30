@@ -9,7 +9,7 @@ module AdequateSerialization
         @name = name
       end
 
-      def serialize_to(response, model, _includes)
+      def serialize_to(_serializer, response, model, _includes)
         response[name] = AdequateSerialization.dump(model.public_send(name))
       end
     end
@@ -22,8 +22,9 @@ module AdequateSerialization
         @block = block
       end
 
-      def serialize_to(response, model, _includes)
-        response[name] = AdequateSerialization.dump(block.call(model))
+      def serialize_to(serializer, response, model, _includes)
+        response[name] =
+          AdequateSerialization.dump(serializer.instance_exec(model, &block))
       end
     end
 
@@ -35,9 +36,9 @@ module AdequateSerialization
         @condition = condition
       end
 
-      def serialize_to(response, model, includes)
+      def serialize_to(serializer, response, model, includes)
         return unless model.public_send(condition)
-        attribute.serialize_to(response, model, includes)
+        attribute.serialize_to(serializer, response, model, includes)
       end
     end
 
@@ -49,9 +50,9 @@ module AdequateSerialization
         @condition = condition
       end
 
-      def serialize_to(response, model, includes)
+      def serialize_to(serializer, response, model, includes)
         return if model.public_send(condition)
-        attribute.serialize_to(response, model, includes)
+        attribute.serialize_to(serializer, response, model, includes)
       end
     end
 
@@ -62,9 +63,9 @@ module AdequateSerialization
         @attribute = attribute
       end
 
-      def serialize_to(response, model, includes)
+      def serialize_to(serializer, response, model, includes)
         return unless includes.include?(attribute.name)
-        attribute.serialize_to(response, model, includes)
+        attribute.serialize_to(serializer, response, model, includes)
       end
     end
 
