@@ -1,6 +1,6 @@
 # AdequateSerialization
 
-[![Build Status](https://travis-ci.org/kddeisz/adequate_serialization.svg?branch=master)](https://travis-ci.org/kddeisz/adequate_serialization)
+[![Build Status](https://travis-ci.org/CultureHQ/adequate_serialization.svg?branch=master)](https://travis-ci.org/CultureHQ/adequate_serialization)
 
 Serializes objects adequately. `AdequateSerialization` allows you to define serializers that will convert your objects into simple hashes that are suitable for variable purposes such as caching or using in an HTTP response. It stems from the simple idea of giving slightly more control over the `as_json` method that gets called when objects are serialized using Rails' default controller serialization.
 
@@ -183,7 +183,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/kddeisz/adequate_serialization.
+Bug reports and pull requests are welcome on GitHub at https://github.com/CultureHQ/adequate_serialization.
 
 ## License
 

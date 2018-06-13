@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['kevin.deisz@gmail.com']
 
   spec.summary       = 'Serializes objects adequately'
-  spec.homepage      = 'https://github.com/kddeisz/adequate_serialization'
+  spec.homepage      = 'https://github.com/CultureHQ/adequate_serialization'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
