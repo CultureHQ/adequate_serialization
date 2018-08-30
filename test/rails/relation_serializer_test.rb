@@ -3,6 +3,24 @@
 class RelationSerializerTest < Minitest::Test
   include AdequateSerialization::Rails
 
+  module SQLCounter
+    class << self
+      attr_reader :log
+
+      def clear
+        @log = []
+      end
+
+      def call(*, values)
+        @log << values[:sql]
+      end
+    end
+
+    clear
+
+    ActiveSupport::Notifications.subscribe('sql.active_record', self)
+  end
+
   def setup
     Rails.cache.clear
   end
@@ -37,7 +55,39 @@ class RelationSerializerTest < Minitest::Test
     assert_correct_attachment_behavior relation, serialized
   end
 
+  def test_does_not_trigger_extra_queries_when_not_loaded
+    relation = Post.all
+
+    assert_queries 1 do
+      RelationSerializer.new(relation).as_json
+    end
+  end
+
+  def test_does_not_trigger_extra_queries_when_loaded
+    relation = Post.all.tap(&:load)
+
+    assert_no_queries do
+      RelationSerializer.new(relation).as_json
+    end
+  end
+
   private
+
+  def assert_correct_attachment_behavior(relation, serialized)
+    relation.each_with_index do |record, index|
+      refute Rails.cache.fetch(record).key?(:double_id)
+      assert_equal record.id * 2, serialized[index][:double_id]
+    end
+  end
+
+  def assert_no_queries(&block)
+    assert_queries(0, &block)
+  end
+
+  def assert_queries(number)
+    SQLCounter.clear
+    yield.tap { assert_equal number, SQLCounter.log.size }
+  end
 
   # Why is there no quick way to determine how many entries are in the cache?
   def entries
@@ -51,12 +101,5 @@ class RelationSerializerTest < Minitest::Test
       end
 
     { attach: { double_id: attachments } }
-  end
-
-  def assert_correct_attachment_behavior(relation, serialized)
-    relation.each_with_index do |record, index|
-      refute Rails.cache.fetch(record).key?(:double_id)
-      assert_equal record.id * 2, serialized[index][:double_id]
-    end
   end
 end

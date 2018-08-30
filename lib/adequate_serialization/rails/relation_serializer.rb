@@ -10,7 +10,12 @@ module AdequateSerialization
       end
 
       def as_json(*options)
-        return [] if relation.empty?
+        # Very purposefully using #length here. If you use #empty? or #count and
+        # the relation isn't yet loaded, it's going to trigger another query.
+        # Since we're going to need to map over each of the results in order to
+        # serialize it anyway, it's better just to load it now and avoid the
+        # extra query.
+        return [] if relation.length.zero?
 
         opts = Options.from(*options, multi_caching: true)
         decorator = Decorator.from(opts.attachments)
