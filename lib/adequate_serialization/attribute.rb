@@ -38,6 +38,7 @@ module AdequateSerialization
 
       def serialize_to(serializer, response, model, includes)
         return unless model.public_send(condition)
+
         attribute.serialize_to(serializer, response, model, includes)
       end
     end
@@ -52,6 +53,7 @@ module AdequateSerialization
 
       def serialize_to(serializer, response, model, includes)
         return if model.public_send(condition)
+
         attribute.serialize_to(serializer, response, model, includes)
       end
     end
@@ -65,6 +67,7 @@ module AdequateSerialization
 
       def serialize_to(serializer, response, model, includes)
         return unless includes.include?(attribute.name)
+
         attribute.serialize_to(serializer, response, model, includes)
       end
     end
