@@ -4,5 +4,5 @@ source 'https://rubygems.org'
 
 gemspec
 
-gem 'rails', '~> 5', '>= 5.2'
+gem 'rails', '~> 5'
 gem 'sqlite3'
