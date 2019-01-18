@@ -50,8 +50,8 @@ GEM
     arel (9.0.0)
     ast (2.4.0)
     builder (3.2.3)
-    bundler-audit (0.6.0)
-      bundler (~> 1.2)
+    bundler-audit (0.6.1)
+      bundler (>= 1.2.0, < 3)
       thor (~> 0.18)
     concurrent-ruby (1.1.4)
     crass (1.0.4)
@@ -147,7 +147,7 @@ PLATFORMS
 
 DEPENDENCIES
   adequate_serialization!
-  bundler (~> 1)
+  bundler (~> 2)
   bundler-audit (~> 0.6)
   minitest (~> 5)
   rails (~> 5)
@@ -157,4 +157,4 @@ DEPENDENCIES
   sqlite3
 
 BUNDLED WITH
-   1.17.2
+   2.0.0
