@@ -4,25 +4,25 @@ workflow "Main" {
 }
 
 action "Install" {
-  uses = "docker://culturehq/actions-bundler:latest"
+  uses = "Culturehq/actions-bundler@master"
   args = "install"
 }
 
 action "Audit" {
   needs = "Install"
-  uses = "docker://culturehq/actions-bundler:latest"
+  uses = "Culturehq/actions-bundler@master"
   args = "exec bundle audit"
 }
 
 action "Lint" {
   needs = "Install"
-  uses = "docker://culturehq/actions-bundler:latest"
+  uses = "Culturehq/actions-bundler@master"
   args = "exec rubocop --parallel"
 }
 
 action "Test" {
   needs = "Install"
-  uses = "docker://culturehq/actions-bundler:latest"
+  uses = "Culturehq/actions-bundler@master"
   args = "exec rake test"
 }
 
@@ -34,7 +34,7 @@ action "Tag" {
 
 action "Publish" {
   needs = "Tag"
-  uses = "docker://culturehq/actions-bundler:latest"
+  uses = "Culturehq/actions-bundler@master"
   args = "build release:rubygem_push"
   secrets = ["BUNDLE_GEM__PUSH_KEY"]
 }
