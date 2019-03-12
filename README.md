@@ -1,5 +1,6 @@
 # AdequateSerialization
 
+[![Actions Status](https://wdp9fww0r9.execute-api.us-west-2.amazonaws.com/production/badge/CultureHQ/adequate_serialization)](https://wdp9fww0r9.execute-api.us-west-2.amazonaws.com/production/results/CultureHQ/adequate_serialization)
 [![Gem Version](https://img.shields.io/gem/v/adequate_serialization.svg)](https://github.com/CultureHQ/adeqaute_serialization)
 
 Serializes objects adequately. `AdequateSerialization` allows you to define serializers that will convert your objects into simple hashes that are suitable for variable purposes such as caching or using in an HTTP response. It stems from the simple idea of giving slightly more control over the `as_json` method that gets called when objects are serialized using Rails' default controller serialization.
