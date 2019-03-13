@@ -5,7 +5,7 @@ workflow "Main" {
 
 action "Install" {
   uses = "docker://culturehq/actions-bundler:latest"
-  args = "install"
+  args = "install --path=vendor/bundle"
 }
 
 action "Audit" {
