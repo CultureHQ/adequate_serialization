@@ -12,6 +12,21 @@ require 'adequate_serialization/steps/passthrough_step'
 require 'adequate_serialization/steps/serialize_step'
 
 module AdequateSerialization
+  class InlineSerializer < Module
+    attr_reader :block
+
+    def initialize(&block)
+      @block = block
+    end
+
+    def included(base)
+      base.include(Serializable)
+
+      serializer = Class.new(Serializer, &block).new
+      base.define_singleton_method(:serializer) { serializer }
+    end
+  end
+
   class << self
     def dump(object)
       if object.is_a?(Hash)
@@ -29,6 +44,10 @@ module AdequateSerialization
           require 'adequate_serialization/rails/hook'
           Rails.hook_in!
         end
+    end
+
+    def inline(&block)
+      InlineSerializer.new(&block)
     end
   end
 end

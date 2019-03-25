@@ -1,7 +1,10 @@
 AllCops:
   DisplayCopNames: true
   DisplayStyleGuide: true
-  TargetRubyVersion: 2.5
+  TargetRubyVersion: 2.6
+
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
 
 Style/Documentation:
   Enabled: false

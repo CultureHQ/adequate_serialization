@@ -22,21 +22,29 @@ Or install it yourself as:
 
 ## Usage
 
-First, include `AdequateSerialization::Serializable` in any object that you want to be able to serialize. Then, define a serializer matching the name of that object, postfixed with `"Serializer"`. Use the `AdequateSerialization` DSL to define the attributes that are available to the serializer. You can then call `as_json` on any instance of that object to get the resultant hash. Below is an example:
+There are two ways to define the serialization process for objects.
+
+For larger objects where it makes sense to define the serialization in a separate class, you should include the `AdequateSerialization::Serializable` in the object that you want to be able to serialize. Then, define a serializer matching the name of that object, postfixed with `"Serializer"`, as in:
 
 ```ruby
-class User
-  include AdequateSerialization::Serializable
-
-  attr_reader :id, :name, :title
-
-  ...
-end
-
 class UserSerializer < AdequateSerialization::Serializer
   attribute :id, :name, :title
 end
+```
 
+For smaller objects where it makes sense to define the serialization inline, you can include the result of the `AdequateSerialization::inline` method, as in:
+
+```ruby
+class User
+  include AdequateSerialization.inline { attribute :id, :name, :title }
+
+  ...
+end
+```
+
+For both types of serialization definition, you can then use the `AdequateSerialization` DSL to define the attributes that are available to the serializer. You can then call `as_json` on any instance of that object to get the resultant hash. Below is an example:
+
+```ruby
 User.new(id: 1, name: 'Clark Kent', title: 'Superman').as_json
 # => {:id=>1, :name=>"Clark Kent", :title=>"Superman"}
 ```

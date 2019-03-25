@@ -71,7 +71,10 @@ Post.create!(title: 'Lame Serialization') do |post|
 end
 
 class User
-  include AdequateSerialization::Serializable
+  include AdequateSerialization.inline {
+    attribute :id, :name
+    attribute :title, optional: true
+  }
 
   attr_reader :id, :name, :title
 
@@ -88,9 +91,4 @@ class User
   def ==(other)
     other.is_a?(User) && id == other.id
   end
-end
-
-class UserSerializer < AdequateSerialization::Serializer
-  attribute :id, :name
-  attribute :title, optional: true
 end

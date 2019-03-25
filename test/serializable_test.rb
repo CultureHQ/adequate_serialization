@@ -2,7 +2,7 @@
 
 class SerializableTest < Minitest::Test
   def test_serializer
-    assert_kind_of UserSerializer, User.serializer
+    assert_kind_of AdequateSerialization::Serializer, User.serializer
   end
 
   def test_serialized
