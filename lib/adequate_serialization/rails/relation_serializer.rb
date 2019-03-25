@@ -64,5 +64,13 @@ module AdequateSerialization
         record.class.serializer.serialize(record, opts)
       end
     end
+
+    module RelationHook
+      def as_json(*options)
+        RelationSerializer.new(self).as_json(*options)
+      end
+    end
+
+    ActiveRecord::Relation.include(RelationHook)
   end
 end

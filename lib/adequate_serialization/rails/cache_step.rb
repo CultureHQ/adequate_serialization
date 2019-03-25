@@ -2,7 +2,21 @@
 
 module AdequateSerialization
   module Rails
-    class CacheStep < Steps::PassthroughStep
+    module CacheKey
+      def self.cacheable?(object)
+        if object.class < ActiveRecord::Base
+          object.has_attribute?(:updated_at)
+        else
+          object.respond_to?(:cache_key)
+        end
+      end
+
+      def self.for(object, includes = [])
+        includes.empty? ? object : [object, *includes]
+      end
+    end
+
+    class CacheStep < Steps::Step
       def apply(response)
         object = response.object
         opts = response.opts
@@ -16,5 +30,7 @@ module AdequateSerialization
         end
       end
     end
+
+    AdequateSerialization.prepend(CacheStep)
   end
 end

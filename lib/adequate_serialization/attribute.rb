@@ -1,6 +1,16 @@
 # frozen_string_literal: true
 
 module AdequateSerialization
+  def self.dump(object)
+    if object.is_a?(Hash)
+      object
+    elsif object.respond_to?(:as_json)
+      object.as_json
+    else
+      object
+    end
+  end
+
   module Attribute
     class Simple
       attr_reader :name

@@ -2,7 +2,7 @@
 
 module AdequateSerialization
   module Steps
-    class SerializeStep < PassthroughStep
+    class SerializeStep < Step
       def apply(response)
         object = response.object
         serialized = object.class.serializer.serialize(object, response.opts)

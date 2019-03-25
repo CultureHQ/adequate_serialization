@@ -132,11 +132,11 @@ This relies on the objects to which you are attaching having an `id` attribute a
 
 ### Usage with Rails
 
-To get `AdequateSerializer` working with Rails, you can call `AdequateSerializion.hook_into_rails!` in an initializer. This will do three things:
+If `::Rails` is defined when `adequate_serialization` is required, it will hook into the serialization process for `ActiveRecord` objects in three ways:
 
-1. Introduce caching behavior so that when serializing objects they will by default be stored in the Rails cache.
-1. Include `AdequateSerializer::Serializable` in `ActiveRecord::Base` so that all of your models will be serializable.
-2. Overwrite `ActiveRecord::Relation`'s `as_json` method to use the `AdequateSerializer::Rails::RelationSerializer` object, which by default will use the `Rails.cache.fetch_multi` method in order to more efficiently serialize all of the records in the relation.
+1. By introducing caching behavior so that when serializing objects they will by default be stored in the Rails cache.
+2. By including `AdequateSerializer::Serializable` in `ActiveRecord::Base` so that all of your models will be serializable.
+3. By overwriting `ActiveRecord::Relation`'s `as_json` method to use the `AdequateSerializer::Rails::RelationSerializer` object, which by default will use the `Rails.cache.fetch_multi` method in order to more efficiently serialize all of the records in the relation.
 
 You can still use plain objects to be serialized, and if you want to take advantage of the caching behavior, you can define a `cache_key` method on the objects that you're serializing. This will cause `AdequateSerialization` to start putting them into the Rails cache.
 
@@ -171,7 +171,7 @@ and the result will now contain the `title` attribute (provided it was configure
 The serialization process happens through a series of `AdequateSerialization::Steps`. The caching behavior mentioned in the `Usage with Rails` section is one such step that gets introduced. You can introduce more yourself like so:
 
 ```ruby
-class LoggingStep < AdequateSerialization::Steps::PassthroughStep
+class LoggingStep < AdequateSerialization::Steps::Step
   def apply(response)
     Logger.log("#{response.object} is being serialized with #{response.opts} options")
     apply_next(response)

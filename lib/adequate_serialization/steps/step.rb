@@ -2,16 +2,10 @@
 
 module AdequateSerialization
   module Steps
-    class LastStep
-      def apply(response)
-        response.object
-      end
-    end
-
-    class PassthroughStep
+    class Step
       attr_reader :next_step
 
-      def initialize(next_step = LastStep.new)
+      def initialize(next_step = :last)
         @next_step = next_step
       end
 
@@ -22,7 +16,7 @@ module AdequateSerialization
       private
 
       def apply_next(response)
-        next_step.apply(response)
+        next_step == :last ? response.object : next_step.apply(response)
       end
     end
   end
