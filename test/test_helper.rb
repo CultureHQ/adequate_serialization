@@ -45,7 +45,7 @@ class Post < ApplicationRecord
 end
 
 class Comment < ApplicationRecord
-  belongs_to :post
+  belongs_to :post, touch: true, inverse_of: :comments
 end
 
 class PostSerializer < AdequateSerialization::Serializer
