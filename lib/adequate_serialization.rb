@@ -21,9 +21,11 @@ require 'adequate_serialization/steps/step'
 require 'adequate_serialization/steps/serialize_step'
 
 if defined?(::Rails)
+  require 'adequate_serialization/rails/app'
   require 'adequate_serialization/rails/cache_busting'
   require 'adequate_serialization/rails/cache_step'
   require 'adequate_serialization/rails/relation_serializer'
+  require 'adequate_serialization/rails/visualizer'
 
   module AdequateSerialization
     Serializer.singleton_class.prepend(CacheBusting)
