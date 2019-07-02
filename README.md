@@ -132,11 +132,20 @@ This relies on the objects to which you are attaching having an `id` attribute a
 
 ### Usage with Rails
 
-If `::Rails` is defined when `adequate_serialization` is required, it will hook into the serialization process for `ActiveRecord` objects in three ways:
+If `::Rails` is defined when `adequate_serialization` is required, it will hook into `ActiveRecord` in three ways:
 
-1. By introducing caching behavior so that when serializing objects they will by default be stored in the Rails cache.
-2. By including `AdequateSerializer::Serializable` in `ActiveRecord::Base` so that all of your models will be serializable.
-3. By overwriting `ActiveRecord::Relation`'s `as_json` method to use the `AdequateSerializer::Rails::RelationSerializer` object, which by default will use the `Rails.cache.fetch_multi` method in order to more efficiently serialize all of the records in the relation.
+1. By including `AdequateSerializer::Serializable` in `ActiveRecord::Base` so that all of your models will be serializable by overwriting `ActiveRecord::Base`'s `as_json` method, which by default will use `Rails.cache.fetch`.
+2. By overwriting `ActiveRecord::Relation`'s `as_json` method to use the `AdequateSerializer::Rails::RelationSerializer` object, which by default will use the `Rails.cache.fetch_multi` method in order to more efficiently serialize all of the records in the relation.
+3. By introducing cache busting behavior in the background using `ActiveJob` if you're serializing objects outside of a one-to-many relationship.
+
+#### Cache busting
+
+When using `adequate_serialization` with `rails`, each `attribute` call will check if you're serializing an association. If you are, then it will ensure you have appropriate caching behavior enabled:
+
+* If it's a `has_many` or `has_one` association, then it will make sure that the inverse has `touch: true` option on the association.
+* If it's a `belongs_to` association, then it will add an `after_update_commit` hook to the inverse class that will loop through the associated objects and bust the association using an `ActiveJob` task.
+
+#### Caching plain objects
 
 You can still use plain objects to be serialized, and if you want to take advantage of the caching behavior, you can define a `cache_key` method on the objects that you're serializing. This will cause `AdequateSerialization` to start putting them into the Rails cache.
 
