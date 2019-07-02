@@ -5,36 +5,55 @@ require 'test_helper'
 class CacheBustingTest < Minitest::Test
   include AdequateSerialization::CacheBusting
 
-  class Org < ApplicationRecord
-    has_many :users, inverse_of: :org
+  class Customer < ApplicationRecord
+    has_many :products, inverse_of: :customer
   end
 
-  class User < ApplicationRecord
-    belongs_to :org, inverse_of: :users
-    belongs_to :special_org
+  class Product < ApplicationRecord
+    belongs_to :customer, inverse_of: :products
+    belongs_to :no_inverse
+
+    has_many :product_tags
+    has_many :tags, through: :product_tags
   end
 
-  class OrgSerializer < AdequateSerialization::Serializer; end
+  class ProductTag < ApplicationRecord
+    belongs_to :product
+    belongs_to :tags
+  end
 
-  class UserSerializer < AdequateSerialization::Serializer; end
+  class Tag < ApplicationRecord
+    has_many :product_tags
+    has_many :products, through: :product_tags
+  end
+
+  class CustomerSerializer < AdequateSerialization::Serializer; end
+
+  class ProductSerializer < AdequateSerialization::Serializer; end
 
   def test_touch_not_found
     assert_raises TouchNotFoundError do
-      OrgSerializer.attribute :users
+      CustomerSerializer.attribute :products
     end
   end
 
   def test_active_job_not_found
     without_active_job do
       assert_raises ActiveJobNotFoundError do
-        UserSerializer.attribute :org
+        ProductSerializer.attribute :customer
       end
     end
   end
 
-  def test_inverse_not_found
+  def test_belongs_to_inverse_not_found
     assert_raises InverseNotFoundError do
-      UserSerializer.attribute :special_org
+      ProductSerializer.attribute :no_inverse
+    end
+  end
+
+  def test_has_many_inverse_not_found
+    assert_raises InverseNotFoundError do
+      ProductSerializer.attribute :tags
     end
   end
 

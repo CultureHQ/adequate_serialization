@@ -51,6 +51,8 @@ module AdequateSerialization
       serialized_associations << association
     end
 
+    # The associations that serialize this object in their responses, so that we
+    # know to bust their cache when this object is updated.
     def serialized_associations
       @serialized_associations ||= []
     end

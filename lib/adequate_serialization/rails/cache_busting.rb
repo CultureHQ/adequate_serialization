@@ -39,6 +39,19 @@ module AdequateSerialization
 
     using(
       Module.new do
+        refine ActiveRecord::Base.singleton_class do
+          def setup_serialize_association(association_name)
+            unless defined?(ActiveJob)
+              raise ActiveJobNotFoundError.new(name, association_name)
+            end
+
+            require 'adequate_serialization/rails/cache_refresh'
+            extend(CacheRefresh) unless respond_to?(:serialize_association)
+
+            serialize_association(association_name)
+          end
+        end
+
         refine ActiveRecord::Reflection::AssociationReflection do
           def setup
             # If the association is polymorphic, we can't rely on the inverse
@@ -67,17 +80,17 @@ module AdequateSerialization
           # Hooks into the serialized class and adds cache busting behavior on
           # commit that will loop through the associated records
           def setup_has_some
-            unless defined?(ActiveJob)
-              raise ActiveJobNotFoundError.new(active_record.name, name)
+            active_record.setup_serialize_association(name)
+          end
+        end
+
+        refine ActiveRecord::Reflection::ThroughReflection do
+          def setup
+            unless inverse_of
+              raise InverseNotFoundError.new(active_record.name, name)
             end
 
-            require 'adequate_serialization/rails/cache_refresh'
-
-            unless active_record.respond_to?(:serialize_association)
-              active_record.extend(CacheRefresh)
-            end
-
-            active_record.serialize_association(name)
+            klass.setup_serialize_association(inverse_of.name)
           end
         end
       end
