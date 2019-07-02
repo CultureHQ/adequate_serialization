@@ -60,13 +60,17 @@ module AdequateSerialization
           def setup_belongs_to
             return if inverse_of.options[:touch]
 
+            record = active_record.name
             raise TouchNotFoundError.new(record, klass.name, inverse_of.name)
           end
 
           # Hooks into the serialized class and adds cache busting behavior on
           # commit that will loop through the associated records
           def setup_has_some
-            raise ActiveJobNotFoundError unless defined?(ActiveJob)
+            unless defined?(ActiveJob)
+              raise ActiveJobNotFoundError.new(active_record.name, name)
+            end
+
             require 'adequate_serialization/rails/cache_refresh'
 
             unless active_record.respond_to?(:serialize_association)

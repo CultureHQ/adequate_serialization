@@ -34,6 +34,7 @@ module AdequateSerialization
 
       def serializes
         return @serializes if defined?(@serializes)
+
         class_name = name.gsub(/Serializer\z/, '')
 
         begin

@@ -36,8 +36,6 @@ end
 
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
-
-  include AdequateSerialization::Serializable
 end
 
 class Post < ApplicationRecord
