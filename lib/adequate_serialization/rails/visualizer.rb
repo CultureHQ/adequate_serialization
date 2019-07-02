@@ -31,7 +31,7 @@ module AdequateSerialization
           end
 
         3.times { svg.shift }
-        svg.join.gsub(/(width|height)="[^"]*"/, '')
+        svg.join.sub(/width="[^"]*"/, '').sub(/height="[^"]*"/, '')
       end
 
       def self.to_svg
@@ -45,7 +45,7 @@ module AdequateSerialization
         base = AdequateSerialization::Serializer
 
         ObjectSpace.each_object(base.singleton_class).select do |serializer|
-          serializer < base && serializer.serializes < ActiveRecord::Base
+          serializer < base && serializer.name && serializer.serializes < ActiveRecord::Base
         end
       end
 
