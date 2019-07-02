@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'adequate_serialization/rails/visualizer'
+require 'faye/websocket'
 
 module AdequateSerialization
   module Rails
@@ -19,7 +20,7 @@ module AdequateSerialization
         end
 
         def call(env)
-          if Faye::WebSocket.websocket?(env)
+          if websocket?(env)
             websocket_response(env)
           else
             app.call(env)
@@ -27,6 +28,15 @@ module AdequateSerialization
         end
 
         private
+
+        def websocket?(env)
+          connection = env['HTTP_CONNECTION'] || ''
+          upgrade    = env['HTTP_UPGRADE']    || ''
+
+          env['REQUEST_METHOD'] == 'GET' &&
+            connection.downcase.split(/ *, */).include?('upgrade') &&
+            upgrade.downcase == 'websocket'
+        end
 
         def hook_into_reload
           middleware = self
@@ -119,7 +129,7 @@ module AdequateSerialization
 
           Rack::Builder.new do
             configurations.each { |middleware, block| use(*middleware, &block) }
-            use Socket if defined?(Faye::Websocket)
+            use Socket # if defined?(Faye::Websocket)
             use Static
             run -> { [404, { 'Content-Type' => 'text/plain' }, ['Not Found']] }
           end
