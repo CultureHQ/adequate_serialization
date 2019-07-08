@@ -35,6 +35,12 @@ class AttributeTest < Minitest::Test
     assert_equal 'bazbaz', serialized[:bar]
   end
 
+  def test_if_condition_name
+    attribute = IfCondition.new(Simple.new(:foo), :foo?)
+
+    assert_equal :foo, attribute.name
+  end
+
   def test_if_condition_attribute_when_true
     attribute = IfCondition.new(Simple.new(:foo), :foo?)
     serialized = {}
@@ -51,6 +57,12 @@ class AttributeTest < Minitest::Test
     refute serialized.key?(:foo)
   end
 
+  def test_unless_condition_name
+    attribute = UnlessCondition.new(Simple.new(:foo), :foo?)
+
+    assert_equal :foo, attribute.name
+  end
+
   def test_unless_condition_attribute_when_true
     attribute = UnlessCondition.new(Simple.new(:foo), :foo?)
     serialized = {}
@@ -65,6 +77,12 @@ class AttributeTest < Minitest::Test
 
     attribute.serialize_to(nil, serialized, Model.new(false), [])
     assert_equal 'baz', serialized[:foo]
+  end
+
+  def test_optional_condition_name
+    attribute = Optional.new(Simple.new(:foo))
+
+    assert_equal :foo, attribute.name
   end
 
   def test_optional_attribute_when_included

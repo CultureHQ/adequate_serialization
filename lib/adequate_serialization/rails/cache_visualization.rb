@@ -75,6 +75,8 @@ module AdequateSerialization
           serializer < base &&
             serializer.name &&
             serializer.serializes < ActiveRecord::Base
+        rescue AdequateSerialization::Serializer::ClassNotFoundError
+          false
         end
       end
 
