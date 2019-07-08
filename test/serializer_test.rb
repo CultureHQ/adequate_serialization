@@ -42,6 +42,8 @@ class SerializerTest < Minitest::Test
     end
   end
 
+  class BarSerializer < AdequateSerialization::Serializer; end
+
   def test_attributes
     assert_equal 10, FooSerializer.attributes.size
   end
@@ -92,6 +94,14 @@ class SerializerTest < Minitest::Test
     actual = FooSerializer.new.serialize(Foo.new(foo: true, bar: false), opts)
 
     assert_equal 'all', actual[:all]
+  end
+
+  def test_serializes
+    assert_equal Foo, FooSerializer.serializes
+
+    assert_raises AdequateSerialization::Serializer::ClassNotFoundError do
+      BarSerializer.serializes
+    end
   end
 
   private

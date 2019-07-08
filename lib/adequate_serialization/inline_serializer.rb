@@ -37,9 +37,16 @@ module AdequateSerialization
     def included(base)
       base.include(Serializable)
 
+      serializer_class = Class.new(Serializer)
+
+      # In order to validate the attribute, we need to define the `serializes`
+      # method before we evaluate the block
+      serializer_class.define_singleton_method(:serializes) { base }
+      serializer_class.class_eval(&block)
+
       # No need to memoize within the method because the block will hold on to
       # local variables for us.
-      serializer = Class.new(Serializer, &block).new
+      serializer = serializer_class.new
       base.define_singleton_method(:serializer) { serializer }
     end
   end

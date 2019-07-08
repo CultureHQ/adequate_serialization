@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=5">
+    <title>AdequateSerialization</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <style type="text/css">
+html,
+body {
+  font-family: Verdana, Geneva, sans-serif;
+  line-height: 1.2em;
+  margin: 0;
+  padding: 0;
+}
+
+main {
+  padding: 0 1em 1em;
+}
+    </style>
+  </head>
+  <body data-script="<%= script_name %>">
+    <main>
+      <h1>AdequateSerialization</h1>
+      <p>
+        Below is a visualization of the associations that you are serializing.
+        The arrows represent which cache will get busted when you update an
+        object.
+      </p>
+      <p>
+        For instance, if you have an arrow pointing from
+        <code>Post</code> to <code>Comment</code>, it would mean that when
+        <code>Comment</code> objects are serialized they are serializing
+        <code>Post</code> objects as part of their response. In this case
+        <code>Post</code> objects need to bust the cache of their associated
+        <code>Comment</code> objects when they are updated.
+        <code>AdequateSerialization</code> takes care of this by enqueuing a
+        background job.
+      </p>
+      <div id="svg">
+        <%= svg %>
+      </div>
+    </main>
+  </body>
+</html>

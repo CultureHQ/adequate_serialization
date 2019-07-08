@@ -46,6 +46,10 @@ module AdequateSerialization
         @condition = condition
       end
 
+      def name
+        attribute.name
+      end
+
       def serialize_to(serializer, response, model, includes)
         return unless model.public_send(condition)
 
@@ -61,6 +65,10 @@ module AdequateSerialization
         @condition = condition
       end
 
+      def name
+        attribute.name
+      end
+
       def serialize_to(serializer, response, model, includes)
         return if model.public_send(condition)
 
@@ -73,6 +81,10 @@ module AdequateSerialization
 
       def initialize(attribute)
         @attribute = attribute
+      end
+
+      def name
+        attribute.name
       end
 
       def serialize_to(serializer, response, model, includes)

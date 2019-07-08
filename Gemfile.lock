@@ -148,6 +148,7 @@ DEPENDENCIES
   bundler (~> 2)
   bundler-audit (~> 0.6)
   minitest (~> 5)
+  rack-test (~> 1.1)
   rails (~> 5.2)
   rake (~> 12)
   rubocop (~> 0.70)

@@ -3,54 +3,90 @@
 require 'simplecov'
 SimpleCov.start
 
+ENV['RAILS_ENV'] = 'test'
+
 require 'rails/all'
+require 'global_id/identification'
+
 require 'sqlite3'
 require 'minitest/autorun'
 
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'adequate_serialization'
 
-ActiveRecord::Base.establish_connection(
-  adapter: 'sqlite3',
-  database: ':memory:'
-)
+class AdequateSerializationApplication < Rails::Application
+  config.logger = Logger.new('/dev/null')
+  config.cache_store = :memory_store
+  config.eager_load = false
+  config.active_record.sqlite3.represent_boolean_as_integer = true
 
-# This because AR::Migration outputs to standard out and there's no way to shut
-# it off short of redefining $stdout. Lame. I just want green dots.
-ActiveRecord::Migration.prepend(Module.new { def say(*); end })
-
-Rails.cache = ActiveSupport::Cache::MemoryStore.new
-
-ActiveRecord::Schema.define do
-  create_table :posts, force: true do |t|
-    t.string :title
-    t.timestamps
+  def config.database_configuration
+    { 'test' => { 'adapter' => 'sqlite3', 'database' => ':memory:' } }
   end
 
-  create_table :comments, force: true do |t|
-    t.references :post
-    t.string :body
-    t.timestamps
-  end
+  initialize!
 end
 
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
-
-  include AdequateSerialization::Serializable
 end
 
-class Post < ApplicationRecord
-  has_many :comments
+class Tag < ApplicationRecord
+  connection.create_table :tags, force: true do |t|
+    t.string :name
+    t.timestamps
+  end
+
+  has_many :post_tags
+  has_many :posts, through: :post_tags, inverse_of: :tags
+end
+
+class PostTag < ApplicationRecord
+  connection.create_table :post_tags, force: true do |t|
+    t.references :post
+    t.references :tag
+    t.timestamps
+  end
+
+  belongs_to :post
+  belongs_to :tag
 end
 
 class Comment < ApplicationRecord
-  belongs_to :post
+  connection.create_table :comments, force: true do |t|
+    t.references :post
+    t.string :body
+    t.timestamps
+  end
+
+  belongs_to :post, touch: true, inverse_of: :comments
+end
+
+class Post < ApplicationRecord
+  connection.create_table :posts, force: true do |t|
+    t.string :title
+    t.timestamps
+  end
+
+  has_many :comments
+  has_many :post_tags
+  has_many :tags, through: :post_tags, inverse_of: :posts
+
+  create!(title: 'Adequate Serialization') do |post|
+    post.comments.build([{ body: 'Great post!' }, { body: 'This is great!' }])
+    post.tags.build(name: 'Great')
+  end
+
+  create!(title: 'Other Serialization Techniques')
+
+  create!(title: 'Lame Serialization') do |post|
+    post.comments.build(body: 'These are super lame.')
+  end
 end
 
 class PostSerializer < AdequateSerialization::Serializer
   attribute :id, :title, :created_at
-  attribute :comments, optional: true
+  attribute :image, :comments, :tags, optional: true
 end
 
 class CommentSerializer < AdequateSerialization::Serializer
@@ -58,14 +94,8 @@ class CommentSerializer < AdequateSerialization::Serializer
   attribute :post, optional: true
 end
 
-Post.create!(title: 'Adequate Serialization') do |post|
-  post.comments.build([{ body: 'Great post!' }, { body: 'This is great!' }])
-end
-
-Post.create!(title: 'Other Serialization Techniques')
-
-Post.create!(title: 'Lame Serialization') do |post|
-  post.comments.build(body: 'These are super lame.')
+class TagSerializer < AdequateSerialization::Serializer
+  attribute :id, :name
 end
 
 class User

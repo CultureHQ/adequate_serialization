@@ -4,6 +4,21 @@
 
 `AdequateSerialization` allows you to define serializers that will convert your objects into simple hashes that are suitable for variable purposes such as caching or using in an HTTP response. It stems from the simple idea of giving slightly more control over the `as_json` method that gets called when objects are serialized using Rails' default controller serialization.
 
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Defining attributes](#defining-attributes)
+    - [:if](#if)
+    - [:unless](#unless)
+    - [:optional](#optional)
+  - [Attaching objects](#attaching-objects)
+  - [Usage with Rails](#usage-with-rails)
+    - [Cache busting](#cache-busting)
+    - [Caching plain objects](#caching-plain-objects)
+  - [Advanced](#advanced)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -132,11 +147,31 @@ This relies on the objects to which you are attaching having an `id` attribute a
 
 ### Usage with Rails
 
-If `::Rails` is defined when `adequate_serialization` is required, it will hook into the serialization process for `ActiveRecord` objects in three ways:
+If `::Rails` is defined when `adequate_serialization` is required, it will hook into `ActiveRecord` in three ways:
 
-1. By introducing caching behavior so that when serializing objects they will by default be stored in the Rails cache.
-2. By including `AdequateSerializer::Serializable` in `ActiveRecord::Base` so that all of your models will be serializable.
-3. By overwriting `ActiveRecord::Relation`'s `as_json` method to use the `AdequateSerializer::Rails::RelationSerializer` object, which by default will use the `Rails.cache.fetch_multi` method in order to more efficiently serialize all of the records in the relation.
+1. By including `AdequateSerializer::Serializable` in `ActiveRecord::Base` so that all of your models will be serializable by overwriting `ActiveRecord::Base`'s `as_json` method, which by default will use `Rails.cache.fetch`.
+2. By overwriting `ActiveRecord::Relation`'s `as_json` method to use the `AdequateSerializer::Rails::RelationSerializer` object, which by default will use the `Rails.cache.fetch_multi` method in order to more efficiently serialize all of the records in the relation.
+3. By introducing cache busting behavior in the background using `ActiveJob` if you're serializing objects outside of a one-to-many relationship.
+
+#### Cache busting
+
+When using `adequate_serialization` with `rails`, each `attribute` call will check if you're serializing an association. If you are, then it will ensure you have appropriate caching behavior enabled:
+
+* If it's a `has_many` or `has_one` association, then it will make sure that the inverse has the `touch: true` option on the association.
+* If it's a `belongs_to` association, then it will add an `after_update_commit` hook to the inverse class that will loop through the associated objects and bust the association using an `ActiveJob` task.
+
+You can visualize this cache busting behavior with a prebaked Rack application that is shipped with this gem by adding the following to your `config/routes.rb` file:
+
+```ruby
+if Rails.env.development?
+  mount AdequateSerialization::Rails::CacheVisualization,
+        at: '/cache_visualization'
+end
+```
+
+This will allow you to view which caches will bust which others in development by navigating to your application's `/cache_visualization` path.
+
+#### Caching plain objects
 
 You can still use plain objects to be serialized, and if you want to take advantage of the caching behavior, you can define a `cache_key` method on the objects that you're serializing. This will cause `AdequateSerialization` to start putting them into the Rails cache.
 

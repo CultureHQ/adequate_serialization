@@ -9,6 +9,10 @@ class CacheStepTest < Minitest::Test
     Rails.cache.clear
   end
 
+  def teardown
+    Rails.cache.clear
+  end
+
   def test_a_non_record_non_cachable_object
     object = Object.new
 
