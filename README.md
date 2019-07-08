@@ -142,7 +142,7 @@ If `::Rails` is defined when `adequate_serialization` is required, it will hook 
 
 When using `adequate_serialization` with `rails`, each `attribute` call will check if you're serializing an association. If you are, then it will ensure you have appropriate caching behavior enabled:
 
-* If it's a `has_many` or `has_one` association, then it will make sure that the inverse has `touch: true` option on the association.
+* If it's a `has_many` or `has_one` association, then it will make sure that the inverse has the `touch: true` option on the association.
 * If it's a `belongs_to` association, then it will add an `after_update_commit` hook to the inverse class that will loop through the associated objects and bust the association using an `ActiveJob` task.
 
 You can visualize this cache busting behavior with a prebaked Rack application that is shipped with this gem by adding the following to your `config/routes.rb` file:
