@@ -40,7 +40,7 @@ class CacheVisualizationTest < Minitest::Test
     attr_reader :content
 
     def initialize
-      @content = ''
+      @content = +''
     end
 
     def write(content)
