@@ -20,10 +20,10 @@ require 'adequate_serialization/version'
 require 'adequate_serialization/steps/step'
 require 'adequate_serialization/steps/serialize_step'
 
-if defined?(::Rails)
-  require 'adequate_serialization/rails/app'
+if defined?(Rails)
   require 'adequate_serialization/rails/cache_busting'
   require 'adequate_serialization/rails/cache_step'
+  require 'adequate_serialization/rails/cache_visualization'
   require 'adequate_serialization/rails/relation_serializer'
 
   module AdequateSerialization

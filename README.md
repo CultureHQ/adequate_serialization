@@ -145,6 +145,17 @@ When using `adequate_serialization` with `rails`, each `attribute` call will che
 * If it's a `has_many` or `has_one` association, then it will make sure that the inverse has `touch: true` option on the association.
 * If it's a `belongs_to` association, then it will add an `after_update_commit` hook to the inverse class that will loop through the associated objects and bust the association using an `ActiveJob` task.
 
+You can visualize this cache busting behavior with a prebaked Rack application that is shipped with this gem by adding the following to your `config/routes.rb` file:
+
+```ruby
+if Rails.env.development?
+  mount AdequateSerialization::Rails::CacheVisualization,
+        at: '/cache_visualization'
+end
+```
+
+This will allow you to view which caches will bust which others in development by navigating to your application's `/cache_visualization` path.
+
 #### Caching plain objects
 
 You can still use plain objects to be serialized, and if you want to take advantage of the caching behavior, you can define a `cache_key` method on the objects that you're serializing. This will cause `AdequateSerialization` to start putting them into the Rails cache.
