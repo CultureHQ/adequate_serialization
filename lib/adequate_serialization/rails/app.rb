@@ -1,139 +1,102 @@
 # frozen_string_literal: true
 
-require 'adequate_serialization/rails/visualizer'
-require 'faye/websocket'
-
 module AdequateSerialization
   module Rails
-    module App
-      # An optional middleware that will get loaded if faye/websocket has been
-      # required.
-      class Socket
-        KEEPALIVE = 15
-
-        attr_reader :app, :clients
-
-        def initialize(app)
-          @app = app
-          @clients = []
-          hook_into_reload
-        end
-
-        def call(env)
-          if websocket?(env)
-            websocket_response(env)
-          else
-            app.call(env)
+    class App
+      # Converts the abstract graph of classes that bust each others' serialized
+      # caches into an SVG that can be rendered on an HTML page.
+      class Visualizer
+        using(
+          Module.new do
+            refine ActiveRecord::Reflection::AbstractReflection do
+              def to_dot
+                "#{klass.name} -> #{active_record.name} [label=\"#{name}\"];"
+              end
+            end
           end
+        )
+
+        def to_dot
+          <<~EODOT
+            digraph attributes {
+              node [shape = circle];
+              #{reflections.map(&:to_dot).join("\n  ")}
+            }
+          EODOT
         end
 
-        private
-
-        def websocket?(env)
-          connection = env['HTTP_CONNECTION'] || ''
-          upgrade    = env['HTTP_UPGRADE']    || ''
-
-          env['REQUEST_METHOD'] == 'GET' &&
-            connection.downcase.split(/ *, */).include?('upgrade') &&
-            upgrade.downcase == 'websocket'
-        end
-
-        def hook_into_reload
-          middleware = self
-
-          ActiveSupport::Reloader.to_prepare do
-            AdequateSerialization::Serializer.descendants.each do |serializer|
-              next unless serializer.name
-              next unless serializer.instance_variable_defined?(:@serializes)
-
-              serializer.remove_instance_variable(:@serializes)
+        def to_svg
+          svg =
+            IO.popen('dot -Tsvg', 'w+') do |f|
+              f.write(to_dot)
+              f.close_write
+              f.readlines
             end
 
-            middleware.clients.each { |client| client.send(Visualizer.to_svg) }
-          end
-        end
-
-        def websocket_response(env)
-          client = Faye::WebSocket.new(env, nil, { ping: KEEPALIVE })
-
-          client.on :open do |event|
-            @clients << client
-          end
-
-          client.on :close do |event|
-            @clients.delete(client)
-            client = nil
-          end
-
-          client.rack_response
-        end
-      end
-
-      class Static
-        STATIC = File.expand_path('static', __dir__)
-        FILES =
-          Dir[File.join(STATIC, '*')].map { |path| "/#{File.basename(path)}" }
-
-        attr_reader :app, :server
-
-        def initialize(app)
-          @app = app
-          @server = Rack::File.new(STATIC)
-        end
-
-        def call(env)
-          if env[Rack::PATH_INFO] == '/'
-            render_index(env)
-          elsif FILES.include?(env[Rack::PATH_INFO])
-            server.call(env)
-          else
-            app.call(env)
-          end
+          3.times { svg.shift }
+          svg.join.sub(/width="[^"]*"/, '').sub(/height="[^"]*"/, '')
         end
 
         private
 
-        def render_index(env)
-          content = File.read(File.join(STATIC, 'index.html.erb'))
-          locals = {
-            svg: Visualizer.to_svg,
-            script_name: env[Rack::SCRIPT_NAME]
-          }
+        def serializers
+          ::Rails.application.eager_load!
+          base = AdequateSerialization::Serializer
 
-          result = ERB.new(content).result_with_hash(locals)
-          [200, { 'Content-Type' => 'text/html' }, [result]]
+          ObjectSpace.each_object(base.singleton_class).select do |serializer|
+            serializer < base &&
+              serializer.name &&
+              serializer.serializes < ActiveRecord::Base
+          end
+        end
+
+        def reflections
+          serializers.each_with_object([]) do |serializer, selected|
+            serializer.attributes.each do |attribute|
+              serializes = serializer.serializes
+              reflection = serializes.reflect_on_association(attribute.name)
+
+              next if !reflection || reflection.polymorphic?
+              selected << reflection
+            end
+          end
         end
       end
 
-      class << self
-        def middlewares
-          @middlewares ||= []
+      STATIC = File.expand_path('static', __dir__)
+      FILES = %w[/favicon.ico]
+
+      attr_reader :app, :server
+
+      def initialize
+        @server = Rack::File.new(STATIC)
+      end
+
+      def call(env)
+        if env[Rack::PATH_INFO] == '/'
+          render_index(env)
+        elsif FILES.include?(env[Rack::PATH_INFO])
+          server.call(env)
+        else
+          [404, { 'Content-Type' => 'text/plain' }, ['Not Found']]
         end
+      end
 
-        def use(*args, &block)
-          middlewares << [args, block]
-        end
+      def self.call(env)
+        (@app ||= new).call(env)
+      end
 
-        def call(env)
-          app.call(env)
-        end
+      private
 
-        private
+      def render_index(env)
+        content = File.read(File.join(STATIC, 'index.html.erb'))
+        locals = {
+          svg: Visualizer.new.to_svg,
+          script_name: env[Rack::SCRIPT_NAME]
+        }
 
-        def app
-          @app ||= build_app
-        end
-
-        def build_app
-          configurations = middlewares
-
-          Rack::Builder.new do
-            configurations.each { |middleware, block| use(*middleware, &block) }
-            use Socket # if defined?(Faye::Websocket)
-            use Static
-            run -> { [404, { 'Content-Type' => 'text/plain' }, ['Not Found']] }
-          end
-        end
+        result = ERB.new(content).result_with_hash(locals)
+        [200, { 'Content-Type' => 'text/html' }, [result]]
       end
     end
   end
