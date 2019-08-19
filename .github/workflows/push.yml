@@ -1,33 +1,63 @@
 on: push
 name: Main
 jobs:
-  install:
-    name: Install
+  test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
     - name: Install
-      uses: docker://culturehq/actions-bundler:latest
+      uses: CultureHQ/actions-bundler@master
       with:
         args: install
     - name: Test
-      uses: docker://culturehq/actions-bundler:latest
+      uses: CultureHQ/actions-bundler@master
       with:
         args: exec rake test
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Install
+      uses: CultureHQ/actions-bundler@master
+      with:
+        args: install
     - name: Lint
-      uses: docker://culturehq/actions-bundler:latest
+      uses: CultureHQ/actions-bundler@master
       with:
         args: exec rubocop --parallel
+  audit:
+    name: Audit
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Install
+      uses: CultureHQ/actions-bundler@master
+      with:
+        args: install
+    - name: Update
+      uses: CultureHQ/actions-bundler@master
+      with:
+        args: exec bundle audit --update
     - name: Audit
-      uses: docker://culturehq/actions-bundler:latest
+      uses: CultureHQ/actions-bundler@master
       with:
         args: exec bundle audit
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    needs:
+    - test
+    - lint
+    - audit
+    steps:
     - name: Tag
       uses: actions/bin/filter@master
       with:
         args: tag
     - name: Publish
-      uses: docker://culturehq/actions-bundler:latest
+      uses: CultureHQ/actions-bundler@master
       env:
         BUNDLE_GEM__PUSH_KEY: ${{ secrets.BUNDLE_GEM__PUSH_KEY }}
       with:
