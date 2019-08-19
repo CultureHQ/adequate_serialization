@@ -1,0 +1,34 @@
+on: push
+name: Main
+jobs:
+  install:
+    name: Install
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Install
+      uses: docker://culturehq/actions-bundler:latest
+      with:
+        args: install
+    - name: Test
+      uses: docker://culturehq/actions-bundler:latest
+      with:
+        args: exec rake test
+    - name: Lint
+      uses: docker://culturehq/actions-bundler:latest
+      with:
+        args: exec rubocop --parallel
+    - name: Audit
+      uses: docker://culturehq/actions-bundler:latest
+      with:
+        args: exec bundle audit
+    - name: Tag
+      uses: actions/bin/filter@master
+      with:
+        args: tag
+    - name: Publish
+      uses: docker://culturehq/actions-bundler:latest
+      env:
+        BUNDLE_GEM__PUSH_KEY: ${{ secrets.BUNDLE_GEM__PUSH_KEY }}
+      with:
+        args: build release:rubygem_push
