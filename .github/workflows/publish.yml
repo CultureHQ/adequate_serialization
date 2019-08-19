@@ -1,0 +1,21 @@
+on:
+  push:
+    tags:
+    - v*
+name: Publish
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Install
+      uses: docker://culturehq/actions-bundler:latest
+      with:
+        args: install
+    - name: Publish
+      uses: docker://culturehq/actions-bundler:latest
+      env:
+        BUNDLE_GEM__PUSH_KEY: ${{ secrets.BUNDLE_GEM__PUSH_KEY }}
+      with:
+        args: build release:rubygem_push

@@ -1,5 +1,5 @@
 on: push
-name: Main
+name: Push
 jobs:
   test:
     name: Test
@@ -44,22 +44,3 @@ jobs:
       uses: docker://culturehq/actions-bundler:latest
       with:
         args: exec bundle audit
-  publish:
-    name: Publish
-    runs-on: ubuntu-latest
-    needs:
-    - test
-    - lint
-    - audit
-    steps:
-    - uses: actions/checkout@master
-    - name: Tag
-      uses: actions/bin/filter@master
-      with:
-        args: tag
-    - name: Publish
-      uses: docker://culturehq/actions-bundler:latest
-      env:
-        BUNDLE_GEM__PUSH_KEY: ${{ secrets.BUNDLE_GEM__PUSH_KEY }}
-      with:
-        args: build release:rubygem_push
