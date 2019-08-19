@@ -7,11 +7,11 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Install
-      uses: CultureHQ/actions-bundler@master
+      uses: docker://culturehq/actions-bundler:latest
       with:
         args: install
     - name: Test
-      uses: CultureHQ/actions-bundler@master
+      uses: docker://culturehq/actions-bundler:latest
       with:
         args: exec rake test
   lint:
@@ -20,11 +20,11 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Install
-      uses: CultureHQ/actions-bundler@master
+      uses: docker://culturehq/actions-bundler:latest
       with:
         args: install
     - name: Lint
-      uses: CultureHQ/actions-bundler@master
+      uses: docker://culturehq/actions-bundler:latest
       with:
         args: exec rubocop --parallel
   audit:
@@ -33,15 +33,15 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Install
-      uses: CultureHQ/actions-bundler@master
+      uses: docker://culturehq/actions-bundler:latest
       with:
         args: install
     - name: Update
-      uses: CultureHQ/actions-bundler@master
+      uses: docker://culturehq/actions-bundler:latest
       with:
         args: exec bundle audit --update
     - name: Audit
-      uses: CultureHQ/actions-bundler@master
+      uses: docker://culturehq/actions-bundler:latest
       with:
         args: exec bundle audit
   publish:
@@ -52,12 +52,13 @@ jobs:
     - lint
     - audit
     steps:
+    - uses: actions/checkout@master
     - name: Tag
       uses: actions/bin/filter@master
       with:
         args: tag
     - name: Publish
-      uses: CultureHQ/actions-bundler@master
+      uses: docker://culturehq/actions-bundler:latest
       env:
         BUNDLE_GEM__PUSH_KEY: ${{ secrets.BUNDLE_GEM__PUSH_KEY }}
       with:
