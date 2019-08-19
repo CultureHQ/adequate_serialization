@@ -18,7 +18,6 @@ class AdequateSerializationApplication < Rails::Application
   config.logger = Logger.new('/dev/null')
   config.cache_store = :memory_store
   config.eager_load = false
-  config.active_record.sqlite3.represent_boolean_as_integer = true
 
   def config.database_configuration
     { 'test' => { 'adapter' => 'sqlite3', 'database' => ':memory:' } }
