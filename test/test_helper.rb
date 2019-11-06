@@ -5,7 +5,9 @@ SimpleCov.start
 
 ENV['RAILS_ENV'] = 'test'
 
-require 'rails/all'
+require 'rails'
+require 'active_job/railtie'
+require 'active_record/railtie'
 require 'global_id/identification'
 
 require 'sqlite3'
