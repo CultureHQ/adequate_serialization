@@ -38,6 +38,6 @@ class OptionsTest < Minitest::Test
   private
 
   def opts_for(options)
-    AdequateSerialization::Options::Opts.new(options)
+    AdequateSerialization::Options::Opts.new(**options)
   end
 end

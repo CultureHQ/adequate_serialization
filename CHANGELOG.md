@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ## [Unreleased]
 
+## [1.0.1] - 2019-12-31
+### Changed
+- Fix up Ruby 2.7 warnings.
+
 ## [1.0.0] - 2019-03-25
 ### Added
 - The ability to define serializers inline in the object they're serializing.
@@ -20,6 +24,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 ### Changed
 - No longer trigger another query when the `ActiveRecord` relation being serialized isn't loaded.
 
-[Unreleased]: https://github.com/CultureHQ/adequate_serialization/compare/v1.0.0...HEAD
+[unreleased]: https://github.com/CultureHQ/adequate_serialization/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/CultureHQ/adequate_serialization/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/CultureHQ/adequate_serialization/compare/v0.1.1...v1.0.0
-[0.1.1]: https://github.com/CultureHQ/adequate_serialization/compare/v0.1.0...v0.1.1
+[0.1.1]: https://github.com/CultureHQ/adequate_serialization/compare/fcc7c7...v0.1.1

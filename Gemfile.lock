@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    adequate_serialization (1.0.0)
+    adequate_serialization (1.0.1)
 
 GEM
   remote: https://rubygems.org/
@@ -172,4 +172,4 @@ DEPENDENCIES
   sqlite3 (~> 1.4)
 
 BUNDLED WITH
-   2.0.2
+   2.1.2
