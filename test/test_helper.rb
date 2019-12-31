@@ -16,6 +16,10 @@ require 'minitest/autorun'
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'adequate_serialization'
 
+AdequateSerialization.configure do |config|
+  config.active_job_queue = :low
+end
+
 class AdequateSerializationApplication < Rails::Application
   config.logger = Logger.new('/dev/null')
   config.cache_store = :memory_store

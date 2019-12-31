@@ -1,11 +1,23 @@
 # frozen_string_literal: true
 
+require 'oj'
+
 module AdequateSerialization
   class Error < StandardError
     def initialize(message)
       super(message.gsub("\n", ' '))
     end
   end
+
+  class << self
+    attr_accessor :active_job_queue
+
+    def configure
+      yield self
+    end
+  end
+
+  self.active_job_queue = :default
 end
 
 require 'adequate_serialization/attribute'
@@ -30,4 +42,6 @@ if defined?(Rails)
     Serializer.singleton_class.prepend(CacheBusting)
     ActiveRecord::Base.include(Serializable)
   end
+
+  Oj.optimize_rails
 end

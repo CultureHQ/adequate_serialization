@@ -33,7 +33,7 @@ module AdequateSerialization
         end
       )
 
-      queue_as :default
+      queue_as -> { AdequateSerialization.active_job_queue }
       discard_on ActiveJob::DeserializationError
 
       def perform(record)
