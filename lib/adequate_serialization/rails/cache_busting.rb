@@ -2,7 +2,7 @@
 
 module AdequateSerialization
   module CacheBusting
-    class InverseNotFoundError < StandardError
+    class InverseNotFoundError < Error
       def initialize(record, association)
         super(<<~MSG)
           In order to be able to bust the associated cache for #{record}'s
@@ -14,7 +14,7 @@ module AdequateSerialization
       end
     end
 
-    class TouchNotFoundError < StandardError
+    class TouchNotFoundError < Error
       def initialize(record, associated, inverse)
         super(<<~MSG)
           #{record} serializes all of the associated #{associated} records,
@@ -40,15 +40,12 @@ module AdequateSerialization
     using(
       Module.new do
         refine ActiveRecord::Base.singleton_class do
-          def setup_serialize_association(association_name)
+          def setup_association_cache(association_name)
             unless defined?(ActiveJob)
               raise ActiveJobNotFoundError.new(name, association_name)
             end
 
-            require 'adequate_serialization/rails/cache_refresh'
-            extend(CacheRefresh) unless respond_to?(:serialize_association)
-
-            serialize_association(association_name)
+            AdequateSerialization.associate_cache(self, association_name)
           end
         end
 
@@ -80,7 +77,7 @@ module AdequateSerialization
           # Hooks into the serialized class and adds cache busting behavior on
           # commit that will loop through the associated records
           def setup_has_some
-            active_record.setup_serialize_association(name)
+            klass.setup_association_cache(inverse_of.name)
           end
         end
 
@@ -90,7 +87,7 @@ module AdequateSerialization
               raise InverseNotFoundError.new(active_record.name, name)
             end
 
-            klass.setup_serialize_association(inverse_of.name)
+            klass.setup_association_cache(inverse_of.name)
           end
         end
       end

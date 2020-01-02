@@ -33,11 +33,11 @@ module AdequateSerialization
         end
       )
 
-      queue_as -> { AdequateSerialization.active_job_queue }
+      queue_as AdequateSerialization.active_job_queue
       discard_on ActiveJob::DeserializationError
 
       def perform(record)
-        record.class.serialized_associations.each do |association|
+        record.class.associated_caches.each do |association|
           record.public_send(association).refresh
         end
       end
@@ -47,14 +47,14 @@ module AdequateSerialization
       base.after_update_commit { CacheRefreshJob.perform_later(self) }
     end
 
-    def serialize_association(association)
-      serialized_associations << association
+    def associate_cache(association)
+      associated_caches << association
     end
 
     # The associations that serialize this object in their responses, so that we
     # know to bust their cache when this object is updated.
-    def serialized_associations
-      @serialized_associations ||= []
+    def associated_caches
+      @associated_caches ||= []
     end
   end
 end

@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ## [Unreleased]
 
+## [2.0.1] - 2020-01-02
+
+### Added
+
+- The top level `AdequateSerialization::associate_cache` method for arbitrarily associating caches between records. Useful for things like polymorphic associations which cannot be performed automatically.
+
+### Changed
+
+- Fixed the active job queue setting configuration so that it will properly update ActiveJob when using Sidekiq.
+- Fixed the cache busting for regular has_many relationships.
+- Changed the name of the `::serialized_associations` method to `::associated_caches` to be more clear.
+
 ## [2.0.0] - 2019-12-31
 
 ### Added
@@ -46,7 +58,9 @@ end
 
 - No longer trigger another query when the `ActiveRecord` relation being serialized isn't loaded.
 
-[unreleased]: https://github.com/CultureHQ/adequate_serialization/compare/v1.0.1...HEAD
+[unreleased]: https://github.com/CultureHQ/adequate_serialization/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/CultureHQ/adequate_serialization/compare/v2.0.0...v2.0.1
+[2.0.0]: https://github.com/CultureHQ/adequate_serialization/compare/v1.0.1...v2.0.0
 [1.0.1]: https://github.com/CultureHQ/adequate_serialization/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/CultureHQ/adequate_serialization/compare/v0.1.1...v1.0.0
 [0.1.1]: https://github.com/CultureHQ/adequate_serialization/compare/fcc7c7...v0.1.1

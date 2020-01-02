@@ -10,14 +10,36 @@ module AdequateSerialization
   end
 
   class << self
-    attr_accessor :active_job_queue
+    attr_reader :active_job_queue
 
+    # Configure the queue name that AdequateSerialization will use when
+    # enqueuing jobs to bust associated caches.
+    def active_job_queue=(queue_name)
+      require 'adequate_serialization/rails/cache_refresh'
+      CacheRefresh::CacheRefreshJob.queue_name = queue_name
+    end
+
+    # Associate one or more caches with an active record such that when the
+    # record is updated the associated object caches are also updated.
+    def associate_cache(active_record, *association_names)
+      require 'adequate_serialization/rails/cache_refresh'
+
+      unless active_record.respond_to?(:associate_cache)
+        active_record.extend(CacheRefresh)
+      end
+
+      association_names.each do |association_name|
+        active_record.associate_cache(association_name)
+      end
+    end
+
+    # DSL-like block for parity with other Ruby/Rails libraries.
     def configure
       yield self
     end
   end
 
-  self.active_job_queue = :default
+  @active_job_queue = :default
 end
 
 require 'adequate_serialization/attribute'

@@ -7,47 +7,47 @@ class CacheRefreshTest < Minitest::Test
 
   CacheRefreshJob = AdequateSerialization::CacheRefresh::CacheRefreshJob
 
-  def test_serialized_associations
-    assert_equal %i[post], Comment.serialized_associations
+  def test_associated_caches
+    assert_equal %i[comments post_config tags], Post.associated_caches.sort
   end
 
   def test_enqueues_refresh
-    comment = Comment.first
+    post = Post.first
 
     assert_enqueued_jobs 1, only: CacheRefreshJob do
-      comment.update(body: 'This is a test.')
+      post.update!(title: 'This is a test.')
     end
 
     arguments = enqueued_jobs[0][:args]
-    assert_equal comment, ActiveJob::Arguments.deserialize(arguments)[0]
+    assert_equal post, ActiveJob::Arguments.deserialize(arguments)[0]
   end
 
   def test_enqueues_refresh_after_commit_only
-    comment = Comment.first
+    post = Post.first
 
     assert_no_enqueued_jobs do
       ApplicationRecord.transaction do
-        comment.update(body: 'This is a test')
+        post.update!(title: 'This is a test')
         raise ActiveRecord::Rollback
       end
     end
   end
 
   def test_updates_one
-    comment = Comment.first
-    previous = comment.post.cache_key
+    post = Post.first
+    previous = post.post_config.cache_key
 
-    CacheRefreshJob.perform_now(comment)
+    CacheRefreshJob.perform_now(post)
 
-    refute_equal previous, comment.post.reload.cache_key
+    refute_equal previous, post.post_config.reload.cache_key
   end
 
   def test_updates_many
-    tag = Tag.first
-    previous = tag.posts.first.cache_key
+    post = Post.first
+    previous = post.tags.first.cache_key
 
-    CacheRefreshJob.perform_now(tag)
+    CacheRefreshJob.perform_now(post)
 
-    refute_equal previous, tag.posts.reload.first.cache_key
+    refute_equal previous, post.tags.reload.first.cache_key
   end
 end

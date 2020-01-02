@@ -67,12 +67,23 @@ class Comment < ApplicationRecord
   belongs_to :post, touch: true, inverse_of: :comments
 end
 
+class PostConfig < ApplicationRecord
+  connection.create_table :post_configs, force: true do |t|
+    t.references :post
+    t.boolean :public, default: false, null: false
+    t.timestamps
+  end
+
+  belongs_to :post
+end
+
 class Post < ApplicationRecord
   connection.create_table :posts, force: true do |t|
     t.string :title
     t.timestamps
   end
 
+  has_one :post_config
   has_many :comments
   has_many :post_tags
   has_many :tags, through: :post_tags, inverse_of: :posts
@@ -80,6 +91,7 @@ class Post < ApplicationRecord
   create!(title: 'Adequate Serialization') do |post|
     post.comments.build([{ body: 'Great post!' }, { body: 'This is great!' }])
     post.tags.build(name: 'Great')
+    post.build_post_config(public: true)
   end
 
   create!(title: 'Other Serialization Techniques')
@@ -92,6 +104,11 @@ end
 class PostSerializer < AdequateSerialization::Serializer
   attribute :id, :title, :created_at
   attribute :image, :comments, :tags, optional: true
+end
+
+class PostConfigSerializer < AdequateSerialization::Serializer
+  attribute :id, :public
+  attribute :post, optional: true
 end
 
 class CommentSerializer < AdequateSerialization::Serializer
@@ -125,3 +142,5 @@ class User
     other.is_a?(User) && id == other.id
   end
 end
+
+AdequateSerialization.associate_cache(Post, :tags)
