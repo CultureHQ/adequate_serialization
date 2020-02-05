@@ -3,9 +3,7 @@ pull_request_rules:
     conditions:
       - base=master
       - label=dependencies
-      - status-success=Test
-      - status-success=Lint
-      - status-success=Audit
+      - status-success=CI
     actions:
       merge:
         strict: true
