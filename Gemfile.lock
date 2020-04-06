@@ -91,7 +91,7 @@ GEM
     nio4r (2.5.2)
     nokogiri (1.10.9)
       mini_portile2 (~> 2.4.0)
-    oj (3.10.5)
+    oj (3.10.6)
     parallel (1.19.1)
     parser (2.7.0.5)
       ast (~> 2.4.0)
