@@ -3,6 +3,9 @@ AllCops:
   DisplayStyleGuide: true
   TargetRubyVersion: 2.7
 
+Gemspec/RequiredRubyVersion:
+  Enabled: false
+
 Layout/LineLength:
   Max: 80
 
