@@ -12,7 +12,6 @@ module AdequateSerialization
               return unless any?
 
               update_all(updated_at: Time.now)
-              find_each(&:as_json)
             end
           end
 
@@ -21,7 +20,6 @@ module AdequateSerialization
           refine ActiveRecord::Base do
             def refresh
               touch
-              as_json
             end
           end
 
